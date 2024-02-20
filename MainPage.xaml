@@ -1,0 +1,460 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:Rudymentary"
+             x:Class="Rudymentary.MainPage"
+             
+             >
+    <ContentPage.Resources>
+        <local:KeyToImgSourceConverter x:Key="KeyToImgSource" />
+        <DataTemplate x:Key="SongDataTemplate">
+            <Frame Padding="10" IsClippedToBounds="True" Margin="10, 0, 10, 10" CornerRadius="10">
+                <FlyoutBase.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Add to playlist" Clicked="AddToPlaylistContext_Clicked"/>
+                        <MenuFlyoutItem Text="Remove from playlist" Clicked="RemoveFromPlaylistContext_Clicked" />
+                    </MenuFlyout>
+                </FlyoutBase.ContextFlyout>
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="AlbumPageSongItem_Tapped" NumberOfTapsRequired="1" />
+                </Frame.GestureRecognizers>
+                <Grid ColumnDefinitions="20, 10,*,10,*,10,40">
+
+                    <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
+                    <Label Text="{Binding SongName}" Grid.Column="2"/>
+                    <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="4"/>
+                    <Label Text="{Binding DurationString}" Grid.Column="6" HorizontalTextAlignment="Center"/>
+                </Grid>
+
+            </Frame>
+        </DataTemplate>
+        <DataTemplate x:Key="SongDataTemplateMultiDisc">
+        <Frame Padding="10" IsClippedToBounds="True" Margin="10, 0, 10, 10" CornerRadius="10">
+            <FlyoutBase.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Text="Add to playlist" Clicked="AddToPlaylistContext_Clicked"/>
+                    <MenuFlyoutItem Text="Remove from playlist" Clicked="RemoveFromPlaylistContext_Clicked" />
+                </MenuFlyout>
+            </FlyoutBase.ContextFlyout>
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AlbumPageSongItem_Tapped" NumberOfTapsRequired="1" />
+            </Frame.GestureRecognizers>
+            <Grid ColumnDefinitions="20, 10,*,10,*,10, 20, 10,40">
+
+                <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
+                <Label Text="{Binding SongName}" Grid.Column="2"/>
+                <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="4"/>
+                    <HorizontalStackLayout Grid.Column="6" HorizontalOptions="End">
+                        <Label Text="🖸" TextColor="Gray"/>
+                        <Label Text="{Binding DiscNo}" TextColor="Gray"/>
+                    </HorizontalStackLayout>
+                    
+                    <Label Text="{Binding DurationString}" Grid.Column="8" HorizontalTextAlignment="Center"/>
+            </Grid>
+
+        </Frame>
+        </DataTemplate>
+        <DataTemplate x:Key="PlaylistSongDataTemplate">
+            <Frame Padding="10, 0, 10, 0" IsClippedToBounds="True" Margin="10, 0, 10, 10" CornerRadius="10">
+                <FlyoutBase.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Add to playlist" Clicked="AddToPlaylistContext_Clicked"/>
+                        <MenuFlyoutItem Text="Remove from playlist" Clicked="RemoveFromPlaylistContext_Clicked" />
+                    </MenuFlyout>
+                </FlyoutBase.ContextFlyout>
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="AlbumPageSongItem_Tapped" NumberOfTapsRequired="1" />
+                </Frame.GestureRecognizers>
+                <Grid ColumnDefinitions="20, 10, 54, 10,*,10,*,10,40">
+
+                    <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" VerticalTextAlignment="Center" />
+                    <Frame Grid.Column="2" Margin="0, 0, 0, 0" IsClippedToBounds="True" Padding="0"  CornerRadius="15">
+                        <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" />
+                    </Frame>
+                    
+                    <Label Text="{Binding SongName}" Grid.Column="4" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
+                    <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="6" VerticalTextAlignment="Center"/>
+                    <Label Text="{Binding DurationString}" Grid.Column="8" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                </Grid>
+
+            </Frame>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ScrollView Grid.Column="0" BackgroundColor="{DynamicResource NavigationIconBarBackgroundColor}">
+            <VerticalStackLayout Spacing="30" Padding="20">
+                <Button Text="⌂" Clicked="HomePageButton_Clicked"/>
+                <Button Text="⌕" Clicked="SearchPageButton_Clicked" />
+                <Button Text="⚙" Clicked="SettingsPageButton_Clicked"/>
+                
+            </VerticalStackLayout>
+        </ScrollView>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="100"/>
+            </Grid.RowDefinitions>
+            <ScrollView x:Name="PageHome" BackgroundColor="{DynamicResource HomePageBackgroundColor}" Grid.Row="0" IsVisible="True">
+                <VerticalStackLayout Padding="20" Spacing="20">
+                    <!--<Label Text="Home" HorizontalOptions="Center" VerticalOptions="Center"/> -->
+                    <Label Text="-Albums-" />
+                    <FlexLayout x:Name="HomeAlbumsCollection" 
+                                AlignContent="Start"
+                                AlignItems="Start"
+                                AlignSelf="Start"
+                                Direction="Row"
+                                JustifyContent="Start"
+                                Wrap="Wrap">
+
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border WidthRequest="150" HeightRequest="180" Margin="5" ToolTipProperties.Text="{Binding AlbumName}"
+                                        Stroke="#000000"
+                                        StrokeThickness="1"
+                                        BackgroundColor="#0F0F0F"
+                                        StrokeShape="RoundRectangle 25,25,5,5"
+                                        >
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="AlbumPageButton_Clicked" NumberOfTapsRequired="1" />
+                                    </Border.GestureRecognizers>
+
+                                    <VerticalStackLayout>
+                                        <Image WidthRequest="150" HeightRequest="150" ZIndex="1" BackgroundColor="#181818" Source="{Binding AlbumArt}" Loaded="Image_Loaded"/>
+                                        <Grid RowDefinitions="*,*,*">
+                                            <Label Text="{Binding AlbumName}" Grid.Row="1" ZIndex="5" Padding="10, 3, 10, 0" LineBreakMode="TailTruncation" HorizontalTextAlignment="Center" FontAutoScalingEnabled="True" VerticalTextAlignment="Center">
+
+                                            </Label>
+                                        </Grid>
+
+                                    </VerticalStackLayout>
+
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                    <Label Text="-Playlists-" />
+                    <HorizontalStackLayout Spacing="20">
+                        <CollectionView x:Name="HomePlaylistsCollection" VerticalOptions="Start">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border WidthRequest="150" HeightRequest="180" ToolTipProperties.Text="{Binding AlbumName}"
+                                            Stroke="#000000"
+                                            StrokeThickness="1"
+                                            BackgroundColor="#0F0F0F"
+                                            StrokeShape="RoundRectangle 25,25,5,5">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="AlbumPageButton_Clicked" NumberOfTapsRequired="1" />
+                                        </Border.GestureRecognizers>
+                                        <FlyoutBase.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="Delete Playlist" Clicked="HomePlaylistCollectionContext_DeletePlaylist" />
+                                            </MenuFlyout>
+                                        </FlyoutBase.ContextFlyout>
+                                        <VerticalStackLayout>
+                                            <Image WidthRequest="150" HeightRequest="150" Loaded="Image_Loaded" BackgroundColor="#181818" Source="{Binding AlbumArt}" />
+                                            <Label Text="{Binding AlbumName}" HorizontalTextAlignment="Center" FontAutoScalingEnabled="True" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <Frame BackgroundColor="White" WidthRequest="150" HeightRequest="180">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="CreatePlaylistPageButton_Clicked" />
+                            </Frame.GestureRecognizers>
+                            <VerticalStackLayout>
+                                <Label WidthRequest="100" HeightRequest="100" TextColor="Black" FontSize="24" Text="+"/>
+                                <Label Text="Add a playlist"  TextColor="Black"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </HorizontalStackLayout>
+                    
+                </VerticalStackLayout>
+                
+            </ScrollView>
+            <ScrollView x:Name="PageAlbum" Grid.Row="0" BackgroundColor="{DynamicResource AlbumPageBackgroundColor}" IsVisible="False">
+                <ContentView x:Name="AlbumPageAlbumDataView">
+
+                    <Border Padding="40" StrokeThickness="0">
+
+
+                        <VerticalStackLayout>
+                            <Button Text="←" Clicked="HomePageButton_Clicked"  Margin="0, 0, 0, 0"/>
+                            <Border BackgroundColor="#141414" Margin="0, 10, 0, 0" StrokeThickness="0" Padding="-1, -1, -1, -1"  StrokeShape="RoundRectangle 25,25,25,25">
+
+                                <Grid RowDefinitions="*, *">
+                                    <Grid ColumnDefinitions="256, *" Grid.Row="0">
+                                        <Border Grid.Column="0" StrokeShape="RoundRectangle 25, 25, 25, 25" Stroke="#00000000" BackgroundColor="#0F0F0F">
+                                            <Grid RowDefinitions="256">
+                                                <Image Source="download_svgrepo_com.png" Grid.Row="0" WidthRequest="256" HeightRequest="256" />
+                                                <Image Source="{Binding AlbumArt}" Grid.Row="0" WidthRequest="256" HeightRequest="256" />
+                                            </Grid>
+
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Margin="40, 0, 0, 0">
+                                            <Label Text="{Binding AlbumName}" FontAttributes="Bold" CharacterSpacing="1" VerticalTextAlignment="Center"  FontAutoScalingEnabled="True" FontSize="Large"/>
+                                            <Label Text="{Binding AlbumArtists}" VerticalTextAlignment="Center" FontSize="Medium" TextColor="Gray" FontAttributes="Italic" />
+                                        </VerticalStackLayout>
+
+                                    </Grid>
+                                    <Border Grid.Row="1" BackgroundColor="#242424" Stroke="#0000000" StrokeThickness="0" StrokeShape="RoundRectangle 25,25,25,25" Margin="3, 20, 0, 0">
+                                        <StackLayout x:Name="AlbumPageSongCollection" BindableLayout.ItemTemplate="{StaticResource SongDataTemplate}" Grid.Row="1" Margin="0, 25, 0, 12">
+                                
+                                            
+                                        </StackLayout>
+                                    </Border>
+
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </ContentView>
+            </ScrollView>
+            <ScrollView x:Name="PageSearch" Grid.Row="0" BackgroundColor="{DynamicResource HomePageBackgroundColor}" IsVisible="False">
+                <Grid ColumnDefinitions="50, *, 50">
+                    <Grid RowDefinitions="50, 5, *" Grid.Column="1">
+                    <SearchBar TextChanged="SearchSongSearchEntry_TextChanged" Grid.Row="0" Placeholder="Search.." />
+                    <CollectionView x:Name="SearchSongSearchResults" Grid.Row="2" IsVisible="False">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
+                            </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border StrokeShape="RoundRectangle 10,10,10,10" StrokeThickness="0" BackgroundColor="#000000">
+
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="HomeSearchResultItem_Tapped" NumberOfTapsRequired="1" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="54, 10,*,10,*,10,40,10">
+
+                                        
+                                        <Frame Grid.Column="0" Margin="0, 0, 0, 0" IsClippedToBounds="True" Padding="0"  CornerRadius="15">
+                                            <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" />
+                                        </Frame>
+
+                                        <Label Text="{Binding SongName}" Grid.Column="2" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
+                                        <Label Text="{Binding AlbumName}" TextColor="Gray" Grid.Column="4" VerticalTextAlignment="Center"/>
+                                        <Label Text="{Binding DurationString}" Grid.Column="6" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    </Grid>
+
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+                    
+                </Grid>
+                
+            </ScrollView>
+            <ScrollView x:Name="PageAddToPlaylist" Grid.Row="0" Padding="30" BackgroundColor="#1F1F1F" IsVisible="False">
+                <VerticalStackLayout Spacing="20">
+                    <Button Text="Cancel" Clicked="HomePageButton_Clicked" />
+                    <Label Text="Adding to playlist.." />
+                    <ListView x:Name="AddToPlaylistSelectCollection">
+                        <ListView.ItemTemplate>
+
+                            <DataTemplate>
+                                <ViewCell>
+
+
+                                    <Frame>
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="AddToPlaylist_SelectedPlaylist" NumberOfTapsRequired="1" />
+                                        </Frame.GestureRecognizers>
+                                        <Label Text="{Binding PlaylistName}" />
+                                    </Frame>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+
+            </ScrollView>
+            <!-- This is the create playlist page -->
+            <ScrollView x:Name="PageCreatePlaylist" Grid.Row="0" IsVisible="False" BackgroundColor="#3F3F3F">
+                <Grid RowDefinitions="*">
+                    <Grid Grid.Row="0" ColumnDefinitions="*, *, *">
+                        <VerticalStackLayout Spacing="20" Grid.Column="1" VerticalOptions="Center">
+
+                            <Label Text="Creating Playlist" HorizontalTextAlignment="Center"/>
+                            <Frame BackgroundColor="White" WidthRequest="300" HeightRequest="300" BorderColor="Transparent">
+                                <VerticalStackLayout>
+                                    <Label TextColor="Black" FontSize="64" Text="+" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    <Label TextColor="Black" FontSize="12" Text="Select a Playlist Cover" HorizontalTextAlignment="Center"/>
+                                </VerticalStackLayout>
+
+                            </Frame>
+                            <Frame WidthRequest="250" HeightRequest="75">
+                                <HorizontalStackLayout>
+                                    <CheckBox x:Name="CreatePlaylist_ImageCoverPlaceholderCheckBox" />
+                                    <Label Text="Use default placeholder" VerticalTextAlignment="Center"/>
+                                </HorizontalStackLayout>
+
+                            </Frame>
+
+
+                            <Border Stroke="#000000" StrokeThickness="1" StrokeShape="RoundRectangle 10, 10, 0 ,0" Padding="2,8">
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="15">
+                                    <Label Text="Playlist Name" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    <Entry Text="" x:Name="CreatePlaylist_PlaylistName" HorizontalTextAlignment="Center" BackgroundColor="#1F1F1F" Placeholder="Enter Playlist Name Here"  MinimumWidthRequest="100" IsTextPredictionEnabled="False" IsSpellCheckEnabled="False"/>
+                                </HorizontalStackLayout>
+                            </Border>
+
+
+                            <Button Text="Save Playlist" WidthRequest="250" HeightRequest="90"  Clicked="CreatePlaylistSaveButton_Clicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                </Grid>
+
+            </ScrollView>
+            <Grid x:Name="PageSongLyrics" ColumnDefinitions="50, *, 50" Grid.Row="0" IsVisible="False" BackgroundColor="{DynamicResource AlbumPageBackgroundColor}">
+                <Button Text="←" Grid.Column="0" VerticalOptions="Start" Padding="5" Margin="5, 5, 0, 0" HeightRequest="30" Clicked="HomePageButton_Clicked"/>
+                <ScrollView Grid.Column="1">
+                    <VerticalStackLayout>
+                        <Label Text=""/>
+                        <Label x:Name="SongLyricsTextLabel" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="Large" Text="No lyrics were found from this song's data." />
+                        <Label Text=""/>
+                        <HorizontalStackLayout x:Name="LyricsListBottomContainer" Spacing="5" HorizontalOptions="Center" Padding="0, 0, 0, 10"></HorizontalStackLayout>
+                    </VerticalStackLayout>
+                    
+                </ScrollView>
+                
+            </Grid>
+            <!-- This is the settings page -->
+            <ScrollView x:Name="PageSettings" Grid.Row="0" BackgroundColor="#181818" IsVisible="False">
+
+                <VerticalStackLayout>
+                    <Label Text="Settings" HorizontalTextAlignment="Center" Margin="0,10,0,0" FontSize="Medium"/>
+                    <Border StrokeShape="RoundRectangle 25, 25, 25, 25" Stroke="#00000000" BackgroundColor="#3a3d4d" Margin="100, 20, 100, 0">
+                        <VerticalStackLayout>
+                            <Button x:Name="SettingsAddFolderButton" Text="🗀 Add a folder" Clicked="SettingsPageAddFolderButton_Clicked"/>
+                            <CollectionView x:Name="SettingsFolderCollection" Margin="0,0,0,5">
+
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Stroke="#00000000" StrokeThickness="0" StrokeShape="RoundRectangle 10, 10, 10, 10" BackgroundColor="#080808" Margin="5">
+                                            <HorizontalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                                                <Label Text="{Binding FolderPath}" Padding="10"/>
+                                                <Button Text="X" TextColor="White" BackgroundColor="#fa7070" Clicked="SettingsPageRemoveFolderButton_Clicked"/>
+                                            </HorizontalStackLayout>
+
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                            <Button Text="Check For Changes" Clicked="SettingsGetAlbumsToSongs" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Label Text="" />
+                    <Button Text="Select Theme" WidthRequest="200" Clicked="SettingsPageAddThemeButton_Clicked" />
+                    <Label Text=""/>
+                    <Label Text="Tip: Normalize/compress audio files online for an even sound experience." HorizontalTextAlignment="Center" ToolTipProperties.Text="A normalization implementation in-app with NAudio resulted in noticeably slower performance for relatively longer files." />
+                    <Label Text="This app uses tags to get information on files. You can use projects like MP3TagEdit to easily view and edit these tags." HorizontalTextAlignment="Center" />
+                    <Label Text=""/>
+                    <Label Text=""/>
+                    <Label Text=""/>
+                    <Label Text=""/>
+                    <Label Text=""/>
+                    <Label Text="Message of the day:" HorizontalTextAlignment="Center"  />
+                    <Label Text='Whatever you do, do not listen to Attack on Titan music -- if you could even call it that, of course -- it would be in pretty poor taste.' HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+
+            </ScrollView>
+            <!-- This is the music bar -->
+            <ContentView Grid.Row="1" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}" HeightRequest="100" Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.RowSpan="2" Grid.Row="0" ZIndex="2" VerticalOptions="Start" MaximumWidthRequest="700" HorizontalOptions="Start">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid ColumnDefinitions="100" WidthRequest="100" Grid.Column="0">
+                            <Image WidthRequest="100" Grid.Column="0" Source="download_svgrepo_comwhite.png" BackgroundColor="{DynamicResource UniversalMediaPlayerAlbumArtBackgroundColor}">
+
+                            </Image>
+                            <Image WidthRequest="100" Grid.Column="0" x:Name="UniversalMediaPlayer_AlbumArtImage" Loaded="Image_Loaded" />
+
+                        </Grid>
+                        <Border Grid.Column="1" Stroke="#00000000" MinimumWidthRequest="0" StrokeThickness="0" Margin="-1" StrokeShape="RoundRectangle 0,25, 0, 25" MaximumWidthRequest="350">
+
+                            <Grid RowDefinitions="*,*" MinimumWidthRequest="0" MaximumWidthRequest="350" >
+                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingName" LineBreakMode="TailTruncation" Grid.Row="0" Padding="15, 0, 15, 0" VerticalOptions="End" />
+                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingArtists" LineBreakMode="TailTruncation" Grid.Row="1" Padding="15, 0, 15, 0" VerticalOptions="Start" FontSize="Body" TextColor="DarkGray" />
+                            </Grid>
+
+
+                        </Border>
+
+                    </Grid>
+                    <Grid Grid.Row="0" ColumnSpacing="20" ZIndex="1" VerticalOptions="Center" Padding="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Grid.RowSpan="2" Width="*"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Text="|(" x:Name="UniversalMediaPreviousTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Grid.Column="1" Clicked="UniversalMediaPreviousTrackButton_Clicked" />
+                        <Button x:Name="UniversalMediaPlayStopButton"  Text="|>" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Grid.Column="2" Clicked="UniversalMediaPlayStopButton_Clicked" />
+                        <Button Text=")|" x:Name="UniversalMediaNextTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Clicked="UniversalMediaNextTrackButton_Clicked" Grid.Column="3" />
+                        <Grid Grid.Column="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="50" />
+                            </Grid.ColumnDefinitions>
+                            <Button Text="🎤" x:Name="UniversalMediaShowLyricsButton" Clicked="UniversalMediaElementPlayer_ShowLyricsClicked" Grid.Column="1" TextColor="White" Opacity="0.5" BackgroundColor="Transparent" BorderColor="Transparent" />
+                            <Button Text="⇋" Clicked="UniversalMediaElementPlayer_ShuffleFlagClicked" Grid.Column="2" TextColor="White" Opacity="0.5" BackgroundColor="Transparent" BorderColor="Transparent"/>
+                            <Button Text="⟳" Clicked="UniversalMediaElementPlayer_LoopFlagClicked" FontSize="20" Grid.Column="3" TextColor ="White" BackgroundColor="Transparent" Opacity="0.5" BorderColor="Transparent"/>
+                            <Slider x:Name="UniversalMediaElementPlayer_VolumeSlider" DragCompleted="UniversalMediaElementPlayer_VolumeSlider_DragCompleted" Grid.Column="4" Value="0.5" MaximumTrackColor="White" />
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="1" VerticalOptions="Center" ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <HorizontalStackLayout Grid.Column="1" MaximumWidthRequest="400" VerticalOptions="Center">
+                            <Label x:Name="UniversalMediaSlider_SongPosition"  HorizontalOptions="End" Margin="10" Text="--:--" VerticalTextAlignment="Center" VerticalOptions="Center"/>
+                            <Slider x:Name="UniversalMediaSlider" Grid.Column="1" MinimumWidthRequest="100" WidthRequest="300" VerticalOptions="Center" MinimumTrackColor="{DynamicResource UniversalMediaPlayerThumbColor}"  ThumbColor="{DynamicResource UniversalMediaPlayerThumbColor}" MaximumTrackColor="White" DragCompleted="UniversalMediaSlider_DragCompleted" DragStarted="UniversalMediaSlider_DragStarted"/>
+                            <Label x:Name="UniversalMediaSlider_SongDuration" Margin="10" VerticalOptions="Center" VerticalTextAlignment="Center" Text="--:--"/>
+
+                        </HorizontalStackLayout>
+
+
+                        <toolkit:MediaElement x:Name="UniversalMediaElementPlayer" Source="" MaximumHeightRequest="0" MaximumWidthRequest="0" Volume="0.5" ShouldShowPlaybackControls="False" PositionChanged="UniversalMediaElementPlayer_PositionChanged" MediaEnded="UniversalMediaElementPlayer_MediaEnded" ShouldAutoPlay="True" IsVisible="False" />
+                    </Grid>
+
+                    <!--<Label Text="Hola" HorizontalOptions="Center"/> -->
+                    <!--<Label x:Name="SliderPosition" Text=""/> -->
+
+
+                </Grid>
+            </ContentView>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
