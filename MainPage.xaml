@@ -30,30 +30,30 @@
             </Frame>
         </DataTemplate>
         <DataTemplate x:Key="SongDataTemplateMultiDisc">
-        <Frame Padding="10" IsClippedToBounds="True" Margin="10, 0, 10, 10" CornerRadius="10">
-            <FlyoutBase.ContextFlyout>
-                <MenuFlyout>
-                    <MenuFlyoutItem Text="Add to playlist" Clicked="AddToPlaylistContext_Clicked"/>
-                    <MenuFlyoutItem Text="Remove from playlist" Clicked="RemoveFromPlaylistContext_Clicked" />
-                </MenuFlyout>
-            </FlyoutBase.ContextFlyout>
-            <Frame.GestureRecognizers>
-                <TapGestureRecognizer Tapped="AlbumPageSongItem_Tapped" NumberOfTapsRequired="1" />
-            </Frame.GestureRecognizers>
-            <Grid ColumnDefinitions="20, 10,*,10,*,10, 20, 10,40">
+            <Frame Padding="10" IsClippedToBounds="True" Margin="10, 0, 10, 10" CornerRadius="10">
+                <FlyoutBase.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Add to playlist" Clicked="AddToPlaylistContext_Clicked"/>
+                        <MenuFlyoutItem Text="Remove from playlist" Clicked="RemoveFromPlaylistContext_Clicked" />
+                    </MenuFlyout>
+                </FlyoutBase.ContextFlyout>
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="AlbumPageSongItem_Tapped" NumberOfTapsRequired="1" />
+                </Frame.GestureRecognizers>
+                <Grid ColumnDefinitions="20, 10,*,10,*,10, 20, 10,40">
 
-                <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
-                <Label Text="{Binding SongName}" Grid.Column="2"/>
-                <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="4"/>
+                    <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
+                    <Label Text="{Binding SongName}" Grid.Column="2"/>
+                    <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="4"/>
                     <HorizontalStackLayout Grid.Column="6" HorizontalOptions="End">
                         <Label Text="🖸" TextColor="Gray"/>
                         <Label Text="{Binding DiscNo}" TextColor="Gray"/>
                     </HorizontalStackLayout>
-                    
-                    <Label Text="{Binding DurationString}" Grid.Column="8" HorizontalTextAlignment="Center"/>
-            </Grid>
 
-        </Frame>
+                    <Label Text="{Binding DurationString}" Grid.Column="8" HorizontalTextAlignment="Center"/>
+                </Grid>
+
+            </Frame>
         </DataTemplate>
         <DataTemplate x:Key="PlaylistSongDataTemplate">
             <Frame Padding="10, 0, 10, 0" IsClippedToBounds="True" Margin="10, 0, 10, 10" CornerRadius="10">
@@ -72,7 +72,7 @@
                     <Frame Grid.Column="2" Margin="0, 0, 0, 0" IsClippedToBounds="True" Padding="0"  CornerRadius="15">
                         <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" />
                     </Frame>
-                    
+
                     <Label Text="{Binding SongName}" Grid.Column="4" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
                     <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="6" VerticalTextAlignment="Center"/>
                     <Label Text="{Binding DurationString}" Grid.Column="8" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
@@ -93,7 +93,7 @@
                 <Button Text="⌂" Clicked="HomePageButton_Clicked"/>
                 <Button Text="⌕" Clicked="SearchPageButton_Clicked" />
                 <Button Text="⚙" Clicked="SettingsPageButton_Clicked"/>
-                
+
             </VerticalStackLayout>
         </ScrollView>
         <Grid Grid.Column="1">
@@ -105,7 +105,7 @@
                 <VerticalStackLayout Padding="20" Spacing="20">
                     <!--<Label Text="Home" HorizontalOptions="Center" VerticalOptions="Center"/> -->
                     <Label Text="-Albums-" />
-                    
+
                     <FlexLayout x:Name="HomeAlbumsCollection" 
                                 AlignContent="Start"
                                 AlignItems="Start"
@@ -125,7 +125,7 @@
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="AlbumPageButton_Clicked" NumberOfTapsRequired="1" />
                                     </Border.GestureRecognizers>
-                                    
+
                                     <VerticalStackLayout>
                                         <Image WidthRequest="150" HeightRequest="150" ZIndex="1" BackgroundColor="#181818" Source="{Binding AlbumArt}" Loaded="Image_Loaded"/>
                                         <Grid RowDefinitions="*,*,*">
@@ -179,9 +179,9 @@
                             </VerticalStackLayout>
                         </Frame>
                     </HorizontalStackLayout>
-                    
+
                 </VerticalStackLayout>
-                
+
             </ScrollView>
             <ScrollView x:Name="PageAlbum" Grid.Row="0" BackgroundColor="{DynamicResource AlbumPageBackgroundColor}" IsVisible="False">
                 <ContentView x:Name="AlbumPageAlbumDataView">
@@ -210,8 +210,8 @@
                                     </Grid>
                                     <Border Grid.Row="1" BackgroundColor="#242424" Stroke="#0000000" StrokeThickness="0" StrokeShape="RoundRectangle 25,25,25,25" Margin="3, 20, 0, 0">
                                         <StackLayout x:Name="AlbumPageSongCollection" BindableLayout.ItemTemplate="{StaticResource SongDataTemplate}" Grid.Row="1" Margin="0, 25, 0, 12">
-                                
-                                            
+
+
                                         </StackLayout>
                                     </Border>
 
@@ -225,38 +225,38 @@
             <ScrollView x:Name="PageSearch" Grid.Row="0" BackgroundColor="{DynamicResource HomePageBackgroundColor}" IsVisible="False">
                 <Grid ColumnDefinitions="50, *, 50">
                     <Grid RowDefinitions="50, 5, *" Grid.Column="1">
-                    <SearchBar TextChanged="SearchSongSearchEntry_TextChanged" Grid.Row="0" Placeholder="Search.." />
-                    <CollectionView x:Name="SearchSongSearchResults" Grid.Row="2" IsVisible="False">
+                        <SearchBar TextChanged="SearchSongSearchEntry_TextChanged" Grid.Row="0" Placeholder="Search.." />
+                        <CollectionView x:Name="SearchSongSearchResults" Grid.Row="2" IsVisible="False">
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
                             </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Border StrokeShape="RoundRectangle 10,10,10,10" StrokeThickness="0" BackgroundColor="#000000">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border StrokeShape="RoundRectangle 10,10,10,10" StrokeThickness="0" BackgroundColor="#000000">
 
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="HomeSearchResultItem_Tapped" NumberOfTapsRequired="1" />
-                                    </Border.GestureRecognizers>
-                                    <Grid ColumnDefinitions="54, 10,*,10,*,10,40,10">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="HomeSearchResultItem_Tapped" NumberOfTapsRequired="1" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="54, 10,*,10,*,10,40,10">
 
-                                        
-                                        <Frame Grid.Column="0" Margin="0, 0, 0, 0" IsClippedToBounds="True" Padding="0"  CornerRadius="15">
-                                            <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" />
-                                        </Frame>
 
-                                        <Label Text="{Binding SongName}" Grid.Column="2" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
-                                        <Label Text="{Binding AlbumName}" TextColor="Gray" Grid.Column="4" VerticalTextAlignment="Center"/>
-                                        <Label Text="{Binding DurationString}" Grid.Column="6" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
-                                    </Grid>
+                                            <Frame Grid.Column="0" Margin="0, 0, 0, 0" IsClippedToBounds="True" Padding="0"  CornerRadius="15">
+                                                <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" />
+                                            </Frame>
 
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                                            <Label Text="{Binding SongName}" Grid.Column="2" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
+                                            <Label Text="{Binding AlbumName}" TextColor="Gray" Grid.Column="4" VerticalTextAlignment="Center"/>
+                                            <Label Text="{Binding DurationString}" Grid.Column="6" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                        </Grid>
+
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+
                 </Grid>
-                    
-                </Grid>
-                
+
             </ScrollView>
             <ScrollView x:Name="PageAddToPlaylist" Grid.Row="0" Padding="30" BackgroundColor="#1F1F1F" IsVisible="False">
                 <VerticalStackLayout Spacing="20">
@@ -325,13 +325,15 @@
                 <ScrollView Grid.Column="1">
                     <VerticalStackLayout>
                         <Label Text=""/>
-                        <Label x:Name="SongLyricsTextLabel" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="Large" Text="No lyrics were found from this song's data." />
+                        <!-- <Label x:Name="SongLyricsTextLabel" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="Large" Text="No lyrics were found from this song's data." /> -->
+                        <VerticalStackLayout x:Name="LyricsListLabelContainer"></VerticalStackLayout>
                         <Label Text=""/>
+                        
                         <HorizontalStackLayout x:Name="LyricsListBottomContainer" Spacing="5" HorizontalOptions="Center" Padding="0, 0, 0, 10"></HorizontalStackLayout>
                     </VerticalStackLayout>
-                    
+
                 </ScrollView>
-                
+
             </Grid>
             <!-- This is the settings page -->
             <ScrollView x:Name="PageSettings" Grid.Row="0" BackgroundColor="#181818" IsVisible="False">
@@ -371,7 +373,7 @@
                             <Switch VerticalOptions="Center" AutomationId="QuickLoadAlbums" Toggled="UpdatePreferenceSelection"/>
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
-                    
+
                 </VerticalStackLayout>
 
 
