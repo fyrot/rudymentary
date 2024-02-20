@@ -18,7 +18,7 @@ namespace Rudymentary
 {
     public partial class MainPage : ContentPage
     {
-        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPPAPPLICATIONIDHERE"); // actual api/application id omitted
+        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONID"); // actual api/application id omitted
         
         int count = 0;
         string[] supportedAudioCodecs = { ".mp3", ".flac" };
@@ -38,6 +38,8 @@ namespace Rudymentary
         bool UniversalMediaPlayer_LoopFlag = false;
         bool UniversalMediaPlayer_ShuffleFlag = false;
         bool UniversalMediaSlider_IsBeingDragged = false;
+        Dictionary<string, bool> toggleablePreferences = new Dictionary<string, bool>();
+
         List<string> translatableLanguages = new List<string> { "Original", "Bulgarian", "Czech", "Danish", "German", "Greek", "English", "English (British)", "English (American)", "Spanish", "Estonian", "Finnish", "French", "Hungarian", "Indonesian", "Italian", "Japanese", "Korean", "Lithuanian", "Latvian", "Norwegian", "Dutch", "Polish", "Portuguese", "Portuguese (Brazilian)", "Romanian", "Russian", "Slovak", "Slovenian", "Swedish", "Turkish", "Ukrainian", "Chinese (simplified)" };
         public MainPage()
         {
@@ -45,6 +47,7 @@ namespace Rudymentary
             client.Initialize();
             //client.Dispose();
            // client.Initialize();
+           CheckForUpdatedPreferences();
             if (File.Exists(Path.Combine(FileSystem.Current.AppDataDirectory, "albumtosongs.txt")))
             {
                 List<AlbumDataByteArrayVer> allSavedAlbumDataByteArrayVer = JsonSerializer.Deserialize<List<AlbumDataByteArrayVer>>(File.ReadAllText(Path.Combine(FileSystem.Current.AppDataDirectory, "albumtosongs.txt")));
@@ -249,6 +252,7 @@ namespace Rudymentary
             try
             {
                 FolderPickerResult folderSelected = await FolderPicker.PickAsync(default);
+                SettingsIndexingFoldersActivityIndicator.IsRunning = true;
                 if (folderSelected.IsSuccessful == false) { return; }
                 string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
                 List<string> newFolders = new List<string>();
@@ -260,9 +264,11 @@ namespace Rudymentary
                 File.WriteAllLines(foldersTxtPath, newFolders.Distinct().ToArray());
                 SettingsFolderCollection.ItemsSource = SettingsGetFolders();
                 SettingsGetAlbumsToSongs(new object(), new EventArgs());
+                SettingsIndexingFoldersActivityIndicator.IsRunning = false;
                 await DisplayAlert("Success", "Folder successfully added", "Thanks");
             } catch (Exception ex)
             {
+                SettingsIndexingFoldersActivityIndicator.IsRunning = false;
                 await DisplayAlert("Error encountered!", ex.Message, "Alright");
             }
         }
@@ -305,10 +311,12 @@ namespace Rudymentary
         }
         private async void SettingsPageRemoveFolderButton_Clicked(object sender, EventArgs args)
         {
+
             var button = (Microsoft.Maui.Controls.Button)sender;
             var item = (FolderClass)button.BindingContext;
             string ignorePath = item.FolderPath;
             string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
+            SettingsIndexingFoldersActivityIndicator.IsRunning = true;
             List<string> newFolders = new List<string>();
             foreach (string p in File.ReadAllLines(foldersTxtPath))
             {
@@ -319,6 +327,7 @@ namespace Rudymentary
             SettingsFolderCollection.ItemsSource = SettingsGetFolders();
             SettingsGetAlbumsToSongs(new object(), new EventArgs());
             SettingsUpdatePlaylistsToSongs();
+            SettingsIndexingFoldersActivityIndicator.IsRunning = false;
             await DisplayAlert("Success", ignorePath + " was removed.", "Alright");
             
         }
@@ -363,7 +372,7 @@ namespace Rudymentary
         private void SettingsGetAlbumsToSongs(object sender, EventArgs args)
         {
             allSavedAlbumData.Clear();
-            
+            SettingsIndexingFoldersActivityIndicator.IsRunning = true;
             Dictionary<string, List<Tuple<string, string>>> albumsToSongs = new Dictionary<string, List<Tuple<string, string>>>();
             string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
             if (!File.Exists(foldersTxtPath))
@@ -488,7 +497,9 @@ namespace Rudymentary
                 {
                     allImageReferences[k] = tagFileAlbumArt;
                 }
-                allAlbums.Add(new AlbumData { AlbumName = k, Songs = onlySongsList, AlbumArt=tagFileAlbumArt, AlbumArtists=tagFileAlbumArtists, IsPlaylist = false, MultiDisc= discNumbers.Count > 1 });
+                bool albumIsMultiDisc = discNumbers.Count > 1;
+                if (k == "Download") { albumIsMultiDisc = false; }
+                allAlbums.Add(new AlbumData { AlbumName = k, Songs = onlySongsList, AlbumArt=tagFileAlbumArt, AlbumArtists=tagFileAlbumArtists, IsPlaylist = false, MultiDisc= albumIsMultiDisc });
             }
             songPathToNameTuples.Clear();
             allAlbums.Sort((x, y) => x.AlbumName.CompareTo(y.AlbumName));
@@ -663,6 +674,7 @@ namespace Rudymentary
             //File.WriteAllText(albumtosongsTxtPath, serializedJson);
             //allSavedAlbumData = allAlbums;
             //BindableLayout.SetItemsSource(HomeAlbumsCollection, allAlbums);
+            SettingsIndexingFoldersActivityIndicator.IsRunning = false;
             GC.Collect();
         }
         private void SettingsUpdatePlaylistsToSongs()
@@ -1068,7 +1080,7 @@ namespace Rudymentary
             else { SearchSongSearchResults.IsVisible = false; GC.Collect(); GC.WaitForPendingFinalizers(); }
             List<Tuple<string, SongData>> filteredResults = allSongNameToData.Where(tupleItem => tupleItem.Item1.ToLower().StartsWith(startswith.ToLower())).ToList();
             var extractedSongDataFromTuples = from t in filteredResults select t.Item2;
-            SearchSongSearchResults.ItemsSource = extractedSongDataFromTuples.Take(5).ToObservableCollection();
+            SearchSongSearchResults.ItemsSource = extractedSongDataFromTuples.ToObservableCollection();
             /* this is a horrible implementation
             who wrote this? */
         }
@@ -1177,6 +1189,33 @@ namespace Rudymentary
             UniversalMediaElementPlayer_NewSongSelected(item);
         }
 
-        
+        private void CheckForUpdatedPreferences()
+        {
+            string persistentPreferencesPath = Path.Combine(FileSystem.Current.AppDataDirectory, "preferences.txt");
+            toggleablePreferences.Add("QuickLoadAlbums", false);
+            if (File.Exists(persistentPreferencesPath))
+            {
+                toggleablePreferences = JsonSerializer.Deserialize<Dictionary<string,bool>>(File.ReadAllText(persistentPreferencesPath));
+                foreach (HorizontalStackLayout x in SettingsPreferencesVerticalStack.Children)
+                {
+                    Switch toggleableElement = (Switch)x.Children.ElementAt(1);
+                    toggleableElement.IsToggled = toggleablePreferences[toggleableElement.AutomationId];
+                }
+            } else
+            {
+                File.WriteAllText(persistentPreferencesPath, JsonSerializer.Serialize(toggleablePreferences));
+            }
+        }
+        private void UpdatePreferenceSelection(object sender, ToggledEventArgs e)
+        {
+            string persistentPreferencesPath = Path.Combine(FileSystem.Current.AppDataDirectory, "preferences.txt");
+            foreach (HorizontalStackLayout x in SettingsPreferencesVerticalStack.Children)
+            {
+                Switch toggleableElement = (Switch)x.Children.ElementAt(1);
+                toggleablePreferences[toggleableElement.AutomationId] = toggleableElement.IsToggled;
+            }
+            File.WriteAllText(persistentPreferencesPath, JsonSerializer.Serialize(toggleablePreferences));
+
+        }
     }
 }                           
