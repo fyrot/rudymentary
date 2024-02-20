@@ -359,16 +359,9 @@
                     </Border>
                     <Label Text="" />
                     <Button Text="Select Theme" WidthRequest="200" Clicked="SettingsPageAddThemeButton_Clicked" />
-                    <Label Text=""/>
+                    <Label Text=""/> <!-- Used in place of a 'br' like tag, will have to look up a potential native implementation later -->
                     <Label Text="Tip: Normalize/compress audio files online for an even sound experience." HorizontalTextAlignment="Center" ToolTipProperties.Text="A normalization implementation in-app with NAudio resulted in noticeably slower performance for relatively longer files." />
                     <Label Text="This app uses tags to get information on files. You can use projects like MP3TagEdit to easily view and edit these tags." HorizontalTextAlignment="Center" />
-                    <Label Text=""/>
-                    <Label Text=""/>
-                    <Label Text=""/>
-                    <Label Text=""/>
-                    <Label Text=""/>
-                    <Label Text="Message of the day:" HorizontalTextAlignment="Center"  />
-                    <Label Text='Whatever you do, do not listen to Attack on Titan music -- if you could even call it that, of course -- it would be in pretty poor taste.' HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
 
 
