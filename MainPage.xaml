@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -105,6 +105,7 @@
                 <VerticalStackLayout Padding="20" Spacing="20">
                     <!--<Label Text="Home" HorizontalOptions="Center" VerticalOptions="Center"/> -->
                     <Label Text="-Albums-" />
+                    
                     <FlexLayout x:Name="HomeAlbumsCollection" 
                                 AlignContent="Start"
                                 AlignItems="Start"
@@ -124,7 +125,7 @@
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="AlbumPageButton_Clicked" NumberOfTapsRequired="1" />
                                     </Border.GestureRecognizers>
-
+                                    
                                     <VerticalStackLayout>
                                         <Image WidthRequest="150" HeightRequest="150" ZIndex="1" BackgroundColor="#181818" Source="{Binding AlbumArt}" Loaded="Image_Loaded"/>
                                         <Grid RowDefinitions="*,*,*">
@@ -357,11 +358,20 @@
                             <Button Text="Check For Changes" Clicked="SettingsGetAlbumsToSongs" />
                         </VerticalStackLayout>
                     </Border>
+                    <ActivityIndicator x:Name="SettingsIndexingFoldersActivityIndicator" IsRunning="False" Color="{DynamicResource UniversalMediaPlayerThumbColor}" />
                     <Label Text="" />
                     <Button Text="Select Theme" WidthRequest="200" Clicked="SettingsPageAddThemeButton_Clicked" />
-                    <Label Text=""/> <!-- Used in place of a 'br' like tag, will have to look up a potential native implementation later -->
+                    <Label Text=""/>
                     <Label Text="Tip: Normalize/compress audio files online for an even sound experience." HorizontalTextAlignment="Center" ToolTipProperties.Text="A normalization implementation in-app with NAudio resulted in noticeably slower performance for relatively longer files." />
                     <Label Text="This app uses tags to get information on files. You can use projects like MP3TagEdit to easily view and edit these tags." HorizontalTextAlignment="Center" />
+                    <Line />
+                    <VerticalStackLayout x:Name="SettingsPreferencesVerticalStack">
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Quick load albums" VerticalOptions="Center" ToolTipProperties.Text="Theoretically allows for faster opening of albums but at a performance cost"/>
+                            <Switch VerticalOptions="Center" AutomationId="QuickLoadAlbums" Toggled="UpdatePreferenceSelection"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                    
                 </VerticalStackLayout>
 
 
