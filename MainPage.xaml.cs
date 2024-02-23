@@ -14,7 +14,8 @@ using System.Collections.Immutable;
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
-
+// ignore the various GC.Collect() calls -- unsure whether or not it actually does much or not haha
+// just wanted a way to quickly clear all unused memory when exiting a page
 namespace Rudymentary
 {
     public partial class MainPage : ContentPage
