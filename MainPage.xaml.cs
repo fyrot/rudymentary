@@ -854,8 +854,14 @@ namespace Rudymentary
                     {
                         if (iterator < currentlyPlayingSongData.LyricTimings.Length)
                         {
-                            if (umsPositionTimeSpan > currentlyPlayingSongData.LyricTimings[iterator]) { line.TextColor = Color.Parse("White"); }
-                            else { line.TextColor = Color.Parse("Gray"); }
+                            if (umsPositionTimeSpan > currentlyPlayingSongData.LyricTimings[iterator]) {
+                                //line.TextColor = Color.Parse("White");
+                                line.FadeTo(1.0);
+                            }
+                            else {
+                                //line.TextColor = Color.Parse("Gray"); 
+                                line.Opacity = 0.5;
+                            }
 
 
                             iterator++;
@@ -1246,7 +1252,7 @@ namespace Rudymentary
             File.WriteAllText(albumsToSongsTxtPath, JsonSerializer.Serialize(toSaveAllAlbumData));
             AddToPlaylist_SaveToFile();
             //SongLyricsTextLabel.Text = convertedLyrics;
-            await DisplayAlert("Translated", convertedLyrics + convertedLyrics.Split(Environment.NewLine).Length.ToString(), "Thanks");
+            //await DisplayAlert("Translated", convertedLyrics + convertedLyrics.Split(Environment.NewLine).Length.ToString(), "Thanks");
             LyricsLoadLabel(convertedLyrics);
         }
         private void HomeSearchResultItem_Tapped(object sender, TappedEventArgs e)
@@ -1292,32 +1298,51 @@ namespace Rudymentary
         private async void LyricsLoadLabel(string lyricLabel)
         {
             LyricsListLabelContainer.Clear();
-            //Label breakLine = new Label { Text = "" };
-            //string[] lyricsByLine = Regex.Split(lyricLabel, "\r?\n");
-            lyricLabel.ReplaceLineEndings();
-            string[] lyricsByLine = lyricLabel.Split(Environment.NewLine, StringSplitOptions.None);
-            /*if (lyricsByLine.Length == 1)
+            string[] lyricsByLine = Regex.Split(lyricLabel, "\r?\n");
+            //string[] lyricsByLine = lyricLabel.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.None);
+            if (lyricsByLine.Length == 1)
             {
-                
+                // separate if statement to preserve original formatting on normal lyrics while accounting for formatting given through transliteration   
                 lyricLabel.ReplaceLineEndings();
                 string[] lines = lyricLabel.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.None);
                 
                 lyricsByLine = lines;
                 //await DisplayAlert("How Many Lines?", lines.Length.ToString(), "Cool");
-            } */
+            }
             //await DisplayAlert("number of lyrics", lyricsByLine.Length.ToString(), "Thanks");
             Color defaultTextColor = Color.Parse("White");
-            if (currentlyPlayingSongData.LyricTimings != null) { defaultTextColor = Color.Parse("Gray"); }
+            double textOpacity = 1;
+            if (currentlyPlayingSongData.LyricTimings != null) {
+                //defaultTextColor = Color.Parse("Gray"); 
+                textOpacity = 0.5;
+            }
             //LyricsListLabelContainer.Add(breakLine);
             FontSizeConverter convertToLarge = new FontSizeConverter();
             int automateID = 0;
+            TapGestureRecognizer lyricTapped = new TapGestureRecognizer();
+            lyricTapped.Tapped += (s, e) =>
+            {
+                // s = object sender, e = EventArgs
+                Label senderobj = (Label)s;
+                int automatedIdx = int.Parse(senderobj.AutomationId);
+                MainThread.BeginInvokeOnMainThread(new Action(() =>
+                {
+                    //UniversalMediaElementPlayer.SeekTo(currentlyPlayingSongData.LyricTimings[automatedIdx]);
+                    UniversalMediaSlider.Value = currentlyPlayingSongData.LyricTimings[automatedIdx].TotalSeconds/currentlyPlayingSongData.Duration.TotalSeconds;
+                    UniversalMediaElementPlayer.SeekTo(currentlyPlayingSongData.LyricTimings[automatedIdx]);
+                    
+                }));
+            };
             foreach (string l in lyricsByLine)
             {
-                LyricsListLabelContainer.Add(new Label { Text = l, FontSize=(double)convertToLarge.ConvertFromString("Large"), FontAttributes=FontAttributes.Bold, TextColor=defaultTextColor, HorizontalTextAlignment=TextAlignment.Center, VerticalTextAlignment=TextAlignment.Center, AutomationId = automateID.ToString() });
+                Label lineToBeAdded = new Label { Text = l, FontSize = (double)convertToLarge.ConvertFromString("Large"), FontAttributes = FontAttributes.Bold, Opacity=textOpacity, TextColor = defaultTextColor, HorizontalTextAlignment = TextAlignment.Center, VerticalTextAlignment = TextAlignment.Center, AutomationId = automateID.ToString() };
+                if (currentlyPlayingSongData.LyricTimings != null) { lineToBeAdded.GestureRecognizers.Add(lyricTapped); }
+                LyricsListLabelContainer.Add(lineToBeAdded);
                 automateID++;
             }
             //LyricsListLabelContainer.Add(breakLine);
 
         }
+
     }
 }
