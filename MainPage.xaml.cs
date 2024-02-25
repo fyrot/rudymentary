@@ -14,13 +14,12 @@ using System.Collections.Immutable;
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
-// ignore the various GC.Collect() calls -- unsure whether or not it actually does much or not haha
-// just wanted a way to quickly clear all unused memory when exiting a page
+
 namespace Rudymentary
 {
     public partial class MainPage : ContentPage
     {
-        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONID"); // actual api/application id omitted, of course
+        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONID"); // actual api/application id omitted
         
         int count = 0;
         string[] supportedAudioCodecs = { ".mp3", ".flac" };
@@ -99,6 +98,7 @@ namespace Rudymentary
             public int RenderNumber { get; set; }
             public string ImageKey { get; set; }
             public Dictionary<string, string> Lyrics { get; set; }
+            public TimeSpan[] LyricTimings { get; set; }
             public int DiscNo { get; set; }
 
         }
@@ -200,7 +200,7 @@ namespace Rudymentary
             songDataQueue = (List<SongData>)BindableLayout.GetItemsSource(AlbumPageSongCollection); //(List<SongData>)AlbumPageSongCollection.ItemsSource;
             songDataQueueIndex = songDataQueue.IndexOf(item);
             var overallAlbum = (AlbumData)PageAlbum.BindingContext;
-            var currentArtPngPath = Path.Combine(FileSystem.Current.AppDataDirectory, "currentart.png");
+            //var currentArtPngPath = Path.Combine(FileSystem.Current.AppDataDirectory, "currentart.png");
             if (overallAlbum.AlbumArt != null)
             {
                 //await File.WriteAllBytesAsync(currentArtPngPath, byteToImageConverter.ConvertBackTo(overallAlbum.AlbumArt));
@@ -209,7 +209,7 @@ namespace Rudymentary
             {
                 //await File.WriteAllBytesAsync(currentArtPngPath, new byte[0]);
             }
-
+            
             UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[item.ImageKey];
             UniversalMediaElementPlayer_NewSongSelected(item);
             currentAlbumPlayed = overallAlbum.AlbumName;
@@ -258,7 +258,7 @@ namespace Rudymentary
             try
             {
                 FolderPickerResult folderSelected = await FolderPicker.PickAsync(default);
-                SettingsIndexingFoldersActivityIndicator.IsRunning = true;
+               
                 if (folderSelected.IsSuccessful == false) { return; }
                 string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
                 List<string> newFolders = new List<string>();
@@ -270,12 +270,12 @@ namespace Rudymentary
                 File.WriteAllLines(foldersTxtPath, newFolders.Distinct().ToArray());
                 SettingsFolderCollection.ItemsSource = SettingsGetFolders();
                 SettingsGetAlbumsToSongs(new object(), new EventArgs());
-                SettingsIndexingFoldersActivityIndicator.IsRunning = false;
+               
                 await DisplayAlert("Success", "Folder successfully added", "Thanks");
             }
             catch (Exception ex)
             {
-                SettingsIndexingFoldersActivityIndicator.IsRunning = false;
+                
                 await DisplayAlert("Error encountered!", ex.Message, "Alright");
             }
         }
@@ -325,7 +325,7 @@ namespace Rudymentary
             var item = (FolderClass)button.BindingContext;
             string ignorePath = item.FolderPath;
             string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
-            SettingsIndexingFoldersActivityIndicator.IsRunning = true;
+           
             List<string> newFolders = new List<string>();
             foreach (string p in File.ReadAllLines(foldersTxtPath))
             {
@@ -336,7 +336,7 @@ namespace Rudymentary
             SettingsFolderCollection.ItemsSource = SettingsGetFolders();
             SettingsGetAlbumsToSongs(new object(), new EventArgs());
             SettingsUpdatePlaylistsToSongs();
-            SettingsIndexingFoldersActivityIndicator.IsRunning = false;
+            
             await DisplayAlert("Success", ignorePath + " was removed.", "Alright");
 
         }
@@ -379,10 +379,10 @@ namespace Rudymentary
             }
 
         }
-        private void SettingsGetAlbumsToSongs(object sender, EventArgs args)
+        private async void SettingsGetAlbumsToSongs(object sender, EventArgs args)
         {
             allSavedAlbumData.Clear();
-            SettingsIndexingFoldersActivityIndicator.IsRunning = true;
+            //SettingsIndexingFoldersActivityIndicator.IsRunning = true;
             Dictionary<string, List<Tuple<string, string>>> albumsToSongs = new Dictionary<string, List<Tuple<string, string>>>();
             string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
             if (!File.Exists(foldersTxtPath))
@@ -471,7 +471,28 @@ namespace Rudymentary
                     string tPathName = t.Item1;
                     string tagFileLyrics = tagFile.Tag.Lyrics;
                     if (tagFileLyrics == null) { tagFileLyrics = ""; }
-                    SongData toAppendSongData = new SongData { SongName = tagFileSongName, ArtistName = tagFileArtistName, AlbumName = k, Duration = tagFileDuration, DurationString = string.Format("{0}:{1}", formatTimeSpanData(tagFileDuration.Minutes.ToString()), formatTimeSpanData(tagFileDuration.Seconds.ToString())), SongPath = tPathName, TrackNumber = tagFileTrackNumber, RenderNumber = -1, ImageKey = k, Lyrics = new Dictionary<string, string> { { "Original", tagFileLyrics } }, DiscNo = tagFileDiscNumber };
+                    TimeSpan[] lyricTimings = null;
+                    //TimeSpan[] lyricTimings = new TimeSpan[0];
+                    if (Path.Exists(tPathName.Replace(".mp3", ".lrc")))
+                    {
+                        
+                        List<string> foundLyrics = new List<string>();
+                        List<TimeSpan> temporaryTimings = new List<TimeSpan>();
+                        foreach (string l in File.ReadLines(tPathName.Replace(".mp3", ".lrc")))
+                        {
+                            if (l.Length < 2) { continue; }
+                            if (char.IsDigit(l[1])) {
+                                foundLyrics.Add(l.Substring(10)); 
+                                string timespanToBeParsed = l.Substring(1, 8); // 00:00.00
+                                double timespanInSeconds = (int.Parse(timespanToBeParsed.Substring(0, 2)) * 60) + (int.Parse(timespanToBeParsed.Substring(3, 2))) + (int.Parse(timespanToBeParsed.Substring(6, 2)) / 100);
+                                temporaryTimings.Add(TimeSpan.FromSeconds(timespanInSeconds));
+                            }
+                        }
+                        //await DisplayAlert("Found .lrc", string.Join("\n", foundLyrics), "No way!");
+                        tagFileLyrics = string.Join("\r\n", foundLyrics);
+                        lyricTimings = temporaryTimings.ToArray();
+                    }
+                    SongData toAppendSongData = new SongData { SongName = tagFileSongName, ArtistName = tagFileArtistName, AlbumName = k, Duration = tagFileDuration, DurationString = string.Format("{0}:{1}", formatTimeSpanData(tagFileDuration.Minutes.ToString()), formatTimeSpanData(tagFileDuration.Seconds.ToString())), SongPath = tPathName, TrackNumber = tagFileTrackNumber, RenderNumber = -1, ImageKey = k, Lyrics = new Dictionary<string, string> { { "Original", tagFileLyrics } }, LyricTimings = lyricTimings, DiscNo = tagFileDiscNumber };
                     allSongNameToData.Add(Tuple.Create(tagFileSongName, toAppendSongData));
                     onlySongsList.Add(toAppendSongData);
                 }
@@ -534,7 +555,7 @@ namespace Rudymentary
             GC.Collect();
             //await DisplayAlert("Epic Dictionary Gameplay", serializedJson, "OK Great");
         }
-        private void SettingsGetImageReferenceTest()
+        private async void SettingsGetImageReferenceTest()
         {
             //allSavedAlbumData.Clear();
 
@@ -626,7 +647,8 @@ namespace Rudymentary
                     string tPathName = t.Item1;
                     string tagFileLyrics = tagFile.Tag.Lyrics;
                     if (tagFileLyrics == null) { tagFileLyrics = ""; }
-                    SongData toAppendSongData = new SongData { SongName = tagFileSongName, ArtistName = tagFileArtistName, AlbumName = k, Duration = tagFileDuration, DurationString = string.Format("{0}:{1}", formatTimeSpanData(tagFileDuration.Minutes.ToString()), formatTimeSpanData(tagFileDuration.Seconds.ToString())), SongPath = tPathName, TrackNumber = tagFileTrackNumber, RenderNumber = -1, ImageKey = k, Lyrics = new Dictionary<string, string> { { "Original", tagFileLyrics } }, DiscNo = tagFileDiscNumber };
+                    TimeSpan[] lyricTimings = null;
+                    SongData toAppendSongData = new SongData { SongName = tagFileSongName, ArtistName = tagFileArtistName, AlbumName = k, Duration = tagFileDuration, DurationString = string.Format("{0}:{1}", formatTimeSpanData(tagFileDuration.Minutes.ToString()), formatTimeSpanData(tagFileDuration.Seconds.ToString())), SongPath = tPathName, TrackNumber = tagFileTrackNumber, RenderNumber = -1, ImageKey = k, Lyrics = new Dictionary<string, string> { { "Original", tagFileLyrics } }, LyricTimings=lyricTimings, DiscNo = tagFileDiscNumber };
                     allSongNameToData.Add(Tuple.Create(tagFileSongName, toAppendSongData));
                     onlySongsList.Add(toAppendSongData);
                 }
@@ -684,7 +706,7 @@ namespace Rudymentary
             //File.WriteAllText(albumtosongsTxtPath, serializedJson);
             //allSavedAlbumData = allAlbums;
             //BindableLayout.SetItemsSource(HomeAlbumsCollection, allAlbums);
-            SettingsIndexingFoldersActivityIndicator.IsRunning = false;
+            //SettingsIndexingFoldersActivityIndicator.IsRunning = false;
             GC.Collect();
         }
         private void SettingsUpdatePlaylistsToSongs()
@@ -750,15 +772,17 @@ namespace Rudymentary
                     albumArtists = givenSongData.ArtistName;
                 }
                 client.ClearPresence();
-
+                
                 UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[givenSongData.ImageKey];
                 UniversalMediaPlayer_CurrentlyPlayingName.Text = givenSongData.SongName;
                 UniversalMediaPlayer_CurrentlyPlayingArtists.Text = givenSongData.ArtistName;
                 ToolTipProperties.SetText(UniversalMediaPlayer_CurrentlyPlayingName, givenSongData.SongName);
+                if (UniversalMediaPlayerBar.IsVisible == false) { UniversalMediaPlayerBarRowDefinition.Height = 100; UniversalMediaPlayerBar.HeightRequest = 100; UniversalMediaPlayerBar.FadeTo(0.5, 750); UniversalMediaPlayerBar.FadeTo(1.0, 250); UniversalMediaPlayerBar.IsVisible = true; }
                 UniversalMediaElementPlayer.Stop();
                 UniversalMediaElementPlayer.Source = givenPath;
                 UniversalMediaElementPlayer.Play();
                 currentlyPlayingSongData = givenSongData;
+                
                 if (LyricsListBottomContainer.Children.Count > 0) { LyricsListBottomContainer.Clear(); }
                 if (givenSongData.Lyrics["Original"] != "")
                 {
@@ -811,7 +835,7 @@ namespace Rudymentary
         {
 
             // This has to be outside since we want to update the boxes during a drag too dependent on slider position rather than song/media position
-            MainThread.BeginInvokeOnMainThread(new Action(() =>
+            MainThread.BeginInvokeOnMainThread(new Action(async () =>
             {
                 double umepDuration = UniversalMediaElementPlayer.Duration.TotalSeconds;
                 TimeSpan umsPositionTimeSpan = TimeSpan.FromSeconds(UniversalMediaSlider.Value * umepDuration);
@@ -821,6 +845,23 @@ namespace Rudymentary
                 string umsDurSeconds = formatTimeSpanData(UniversalMediaElementPlayer.Duration.Seconds.ToString());
                 UniversalMediaSlider_SongPosition.Text = $"{umsPosMinutes}:{umsPosSeconds}";
                 UniversalMediaSlider_SongDuration.Text = $"{umsDurMinutes}:{umsDurSeconds}";
+                if (currentlyPlayingSongData.LyricTimings != null && LyricsListLabelContainer.Children.Count > 1)
+                {
+                    // optimize later by only doing this when drag is performed, else just continue along with song and update next line from there
+                    int iterator = 0;
+                    //await DisplayAlert("LyricTimings Are Not Null", "Yeah", "Arigato");
+                    foreach (Label line in LyricsListLabelContainer.Children)
+                    {
+                        if (iterator < currentlyPlayingSongData.LyricTimings.Length)
+                        {
+                            if (umsPositionTimeSpan > currentlyPlayingSongData.LyricTimings[iterator]) { line.TextColor = Color.Parse("White"); }
+                            else { line.TextColor = Color.Parse("Gray"); }
+
+
+                            iterator++;
+                        }
+                    }
+                }
                 if (UniversalMediaSlider_IsBeingDragged == false)
                 {
                     UniversalMediaSlider.Value = UniversalMediaElementPlayer.Position.TotalSeconds / UniversalMediaElementPlayer.Duration.TotalSeconds;
@@ -1073,10 +1114,14 @@ namespace Rudymentary
 
         private void UniversalMediaPreviousTrackButton_Clicked(object sender, EventArgs e)
         {
-            if ((UniversalMediaElementPlayer.Position.TotalSeconds < 3 || ((UniversalMediaElementPlayer.Position.TotalSeconds / UniversalMediaElementPlayer.Duration.TotalSeconds) < 0.02)) && songDataQueueIndex > 0)
+            if ((UniversalMediaElementPlayer.Position.TotalSeconds < 3 || ((UniversalMediaElementPlayer.Position.TotalSeconds / UniversalMediaElementPlayer.Duration.TotalSeconds) < 0.02)))
             {
-                songDataQueueIndex--;
-                UniversalMediaElementPlayer_NewSongSelected(songDataQueue[songDataQueueIndex]);
+                if (songDataQueueIndex > 0)
+                {
+                    songDataQueueIndex--;
+                    UniversalMediaElementPlayer_NewSongSelected(songDataQueue[songDataQueueIndex]);
+                }
+                
             }
             else
             {
@@ -1201,6 +1246,7 @@ namespace Rudymentary
             File.WriteAllText(albumsToSongsTxtPath, JsonSerializer.Serialize(toSaveAllAlbumData));
             AddToPlaylist_SaveToFile();
             //SongLyricsTextLabel.Text = convertedLyrics;
+            await DisplayAlert("Translated", convertedLyrics + convertedLyrics.Split(Environment.NewLine).Length.ToString(), "Thanks");
             LyricsLoadLabel(convertedLyrics);
         }
         private void HomeSearchResultItem_Tapped(object sender, TappedEventArgs e)
@@ -1243,16 +1289,32 @@ namespace Rudymentary
             File.WriteAllText(persistentPreferencesPath, JsonSerializer.Serialize(toggleablePreferences));
 
         }
-        private void LyricsLoadLabel(string lyricLabel)
+        private async void LyricsLoadLabel(string lyricLabel)
         {
             LyricsListLabelContainer.Clear();
             //Label breakLine = new Label { Text = "" };
-            string[] lyricsByLine = Regex.Split(lyricLabel, "\r?\n");
+            //string[] lyricsByLine = Regex.Split(lyricLabel, "\r?\n");
+            lyricLabel.ReplaceLineEndings();
+            string[] lyricsByLine = lyricLabel.Split(Environment.NewLine, StringSplitOptions.None);
+            /*if (lyricsByLine.Length == 1)
+            {
+                
+                lyricLabel.ReplaceLineEndings();
+                string[] lines = lyricLabel.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.None);
+                
+                lyricsByLine = lines;
+                //await DisplayAlert("How Many Lines?", lines.Length.ToString(), "Cool");
+            } */
+            //await DisplayAlert("number of lyrics", lyricsByLine.Length.ToString(), "Thanks");
+            Color defaultTextColor = Color.Parse("White");
+            if (currentlyPlayingSongData.LyricTimings != null) { defaultTextColor = Color.Parse("Gray"); }
             //LyricsListLabelContainer.Add(breakLine);
             FontSizeConverter convertToLarge = new FontSizeConverter();
+            int automateID = 0;
             foreach (string l in lyricsByLine)
             {
-                LyricsListLabelContainer.Add(new Label { Text = l, FontSize=(double)convertToLarge.ConvertFromString("Large"), FontAttributes=FontAttributes.Bold, TextColor=Color.Parse("White"), HorizontalTextAlignment=TextAlignment.Center, VerticalTextAlignment=TextAlignment.Center });
+                LyricsListLabelContainer.Add(new Label { Text = l, FontSize=(double)convertToLarge.ConvertFromString("Large"), FontAttributes=FontAttributes.Bold, TextColor=defaultTextColor, HorizontalTextAlignment=TextAlignment.Center, VerticalTextAlignment=TextAlignment.Center, AutomationId = automateID.ToString() });
+                automateID++;
             }
             //LyricsListLabelContainer.Add(breakLine);
 
