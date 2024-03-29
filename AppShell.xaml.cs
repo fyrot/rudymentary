@@ -1,4 +1,4 @@
-﻿namespace Rudymentary
+﻿namespace RudymentaryNet8
 {
     public partial class AppShell : Shell
     {
