@@ -1,7 +1,8 @@
-﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
-namespace Rudymentary
+
+namespace RudymentaryNet8
 {
     public static class MauiProgram
     {
@@ -19,7 +20,7 @@ namespace Rudymentary
                 });
 
 #if DEBUG
-		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
