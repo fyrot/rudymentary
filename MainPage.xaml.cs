@@ -15,11 +15,11 @@ using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 
-namespace Rudymentary
+namespace RudymentaryNet8
 {
     public partial class MainPage : ContentPage
     {
-        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONID"); // actual api/application id omitted
+        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONIDHERE"); // actual api/application id omitted
         
         int count = 0;
         string[] supportedAudioCodecs = { ".mp3", ".flac" };
@@ -231,6 +231,8 @@ namespace Rudymentary
             PageAlbum.IsVisible = false;
             PageCreatePlaylist.IsVisible = false;
             PageSettings.IsVisible = true;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
         private void CreatePlaylistSaveButton_Clicked(object sender, EventArgs args)
         {
@@ -777,10 +779,11 @@ namespace Rudymentary
                 UniversalMediaPlayer_CurrentlyPlayingName.Text = givenSongData.SongName;
                 UniversalMediaPlayer_CurrentlyPlayingArtists.Text = givenSongData.ArtistName;
                 ToolTipProperties.SetText(UniversalMediaPlayer_CurrentlyPlayingName, givenSongData.SongName);
-                if (UniversalMediaPlayerBar.IsVisible == false) { UniversalMediaPlayerBarRowDefinition.Height = 100; UniversalMediaPlayerBar.HeightRequest = 100; UniversalMediaPlayerBar.FadeTo(0.5, 750); UniversalMediaPlayerBar.FadeTo(1.0, 250); UniversalMediaPlayerBar.IsVisible = true; }
+                
                 UniversalMediaElementPlayer.Stop();
                 UniversalMediaElementPlayer.Source = givenPath;
                 UniversalMediaElementPlayer.Play();
+                if (UniversalMediaPlayerBar.IsVisible == false) { UniversalMediaPlayerBarRowDefinition.Height = 100; UniversalMediaPlayerBar.HeightRequest = 100; UniversalMediaPlayerBar.IsVisible = true; UniversalMediaPlayerBar.FadeTo(1, 500, Easing.SinIn); }
                 currentlyPlayingSongData = givenSongData;
                 
                 if (LyricsListBottomContainer.Children.Count > 0) { LyricsListBottomContainer.Clear(); }
