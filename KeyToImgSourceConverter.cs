@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rudymentary
+namespace RudymentaryNet8
 {
     public class KeyToImgSourceConverter : IValueConverter
     {
