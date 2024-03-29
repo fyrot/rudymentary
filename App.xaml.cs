@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
-namespace Rudymentary
+namespace RudymentaryNet8
 {
     public partial class App : Application
     {
