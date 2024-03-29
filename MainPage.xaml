@@ -2,8 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:local="clr-namespace:Rudymentary"
-             x:Class="Rudymentary.MainPage"
+             xmlns:local="clr-namespace:RudymentaryNet8"
+             x:Class="RudymentaryNet8.MainPage"
              
              >
     <ContentPage.Resources>
@@ -90,16 +90,16 @@
         </Grid.ColumnDefinitions>
         <ScrollView Grid.Column="0" BackgroundColor="{DynamicResource NavigationIconBarBackgroundColor}">
             <VerticalStackLayout Spacing="30" Padding="20">
-                <Button Text="⌂" Clicked="HomePageButton_Clicked"/>
-                <Button Text="⌕" Clicked="SearchPageButton_Clicked" />
-                <Button Text="⚙" Clicked="SettingsPageButton_Clicked"/>
+                <Button Text="⌂" Clicked="HomePageButton_Clicked" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
+                <Button Text="⌕" Clicked="SearchPageButton_Clicked" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
+                <Button Text="⚙" Clicked="SettingsPageButton_Clicked" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
 
             </VerticalStackLayout>
         </ScrollView>
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" BackgroundColor="#00000000">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="100"/>
+                <RowDefinition Height="0" x:Name="UniversalMediaPlayerBarRowDefinition"/>
             </Grid.RowDefinitions>
             <ScrollView x:Name="PageHome" BackgroundColor="{DynamicResource HomePageBackgroundColor}" Grid.Row="0" IsVisible="True">
                 <VerticalStackLayout Padding="20" Spacing="20">
@@ -208,7 +208,7 @@
                                         </VerticalStackLayout>
 
                                     </Grid>
-                                    <Border Grid.Row="1" BackgroundColor="#242424" Stroke="#0000000" StrokeThickness="0" StrokeShape="RoundRectangle 25,25,25,25" Margin="3, 20, 0, 0">
+                                    <Border Grid.Row="1" BackgroundColor="#242424" Stroke="#000000" StrokeThickness="0" StrokeShape="RoundRectangle 25,25,25,25" Margin="3, 20, 0, 0">
                                         <StackLayout x:Name="AlbumPageSongCollection" BindableLayout.ItemTemplate="{StaticResource SongDataTemplate}" Grid.Row="1" Margin="0, 25, 0, 12">
 
 
@@ -342,7 +342,7 @@
                     <Label Text="Settings" HorizontalTextAlignment="Center" Margin="0,10,0,0" FontSize="Medium"/>
                     <Border StrokeShape="RoundRectangle 25, 25, 25, 25" Stroke="#00000000" BackgroundColor="#3a3d4d" Margin="100, 20, 100, 0">
                         <VerticalStackLayout>
-                            <Button x:Name="SettingsAddFolderButton" Text="🗀 Add a folder" Clicked="SettingsPageAddFolderButton_Clicked"/>
+                            <Button x:Name="SettingsAddFolderButton" Text="🗀 Add a folder" Clicked="SettingsPageAddFolderButton_Clicked" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
                             <CollectionView x:Name="SettingsFolderCollection" Margin="0,0,0,5">
 
                                 <CollectionView.ItemTemplate>
@@ -357,12 +357,12 @@
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
-                            <Button Text="Check For Changes" Clicked="SettingsGetAlbumsToSongs" />
+                            <Button Text="Check For Changes" Clicked="SettingsGetAlbumsToSongs" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
                         </VerticalStackLayout>
                     </Border>
-                    <ActivityIndicator x:Name="SettingsIndexingFoldersActivityIndicator" IsRunning="False" Color="{DynamicResource UniversalMediaPlayerThumbColor}" />
+                    <!-- <ActivityIndicator x:Name="SettingsIndexingFoldersActivityIndicator" IsRunning="False" Color="{DynamicResource UniversalMediaPlayerThumbColor}" /> -->
                     <Label Text="" />
-                    <Button Text="Select Theme" WidthRequest="200" Clicked="SettingsPageAddThemeButton_Clicked" />
+                    <Button Text="Select Theme" WidthRequest="200" Clicked="SettingsPageAddThemeButton_Clicked" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
                     <Label Text=""/>
                     <Label Text="Tip: Normalize/compress audio files online for an even sound experience." HorizontalTextAlignment="Center" ToolTipProperties.Text="A normalization implementation in-app with NAudio resulted in noticeably slower performance for relatively longer files." />
                     <Label Text="This app uses tags to get information on files. You can use projects like MP3TagEdit to easily view and edit these tags." HorizontalTextAlignment="Center" />
@@ -379,7 +379,7 @@
 
             </ScrollView>
             <!-- This is the music bar -->
-            <ContentView Grid.Row="1" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}" HeightRequest="100" Padding="0">
+            <ContentView Grid.Row="1" x:Name="UniversalMediaPlayerBar" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}" IsVisible="False" Opacity="0.01" HeightRequest="0" Padding="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
