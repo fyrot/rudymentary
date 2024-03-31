@@ -783,7 +783,23 @@ namespace RudymentaryNet8
                 UniversalMediaElementPlayer.Stop();
                 UniversalMediaElementPlayer.Source = givenPath;
                 UniversalMediaElementPlayer.Play();
-                if (UniversalMediaPlayerBar.IsVisible == false) { UniversalMediaPlayerBarRowDefinition.Height = 100; UniversalMediaPlayerBar.HeightRequest = 100; UniversalMediaPlayerBar.IsVisible = true; UniversalMediaPlayerBar.FadeTo(1, 500, Easing.SinIn); }
+                if (UniversalMediaPlayerBar.IsVisible == false) {
+                    // animated fade-in of player bar when first song is selected
+                    UniversalMediaPlayerBar.IsVisible = true;
+                    UniversalMediaPlayerBar.Opacity = 1; // temporary
+
+
+                    Animation barSizeGrowth = new Animation(v => UniversalMediaPlayerBar.HeightRequest = v, 0, 100); ;
+                    Animation barSizeGrowthRowDefinition = new Animation(v => UniversalMediaPlayerBarRowDefinition.Height = v, 0, 100);
+                    barSizeGrowth.Commit(this, "PlayerBarGrowth", 16, 1000, Easing.CubicOut);
+                    barSizeGrowthRowDefinition.Commit(this, "PlayerBarGrowthRowDefinition", 16, 1000, Easing.CubicOut);
+                    
+                    //UniversalMediaPlayerBarRowDefinition.Height = 100; 
+                    //UniversalMediaPlayerBar.HeightRequest = 100; 
+                    //UniversalMediaPlayerBar.IsVisible = true; 
+                    //UniversalMediaPlayerBar.FadeTo(1, 500, Easing.SinIn); 
+                    // opacity animation i think would make it too confusing with the slide in
+                }
                 currentlyPlayingSongData = givenSongData;
                 
                 if (LyricsListBottomContainer.Children.Count > 0) { LyricsListBottomContainer.Clear(); }
@@ -999,8 +1015,10 @@ namespace RudymentaryNet8
         private async void AddToPlaylistContext_Clicked(object sender, EventArgs e)
         {
             var menuFlyout = (MenuFlyoutItem)sender;
-            var songDataVar = (SongData)menuFlyout.Parent.BindingContext;
+
+            var songDataVar = (SongData)menuFlyout.Parent.Parent.BindingContext;
             addToPlaylistToBeAdded = songDataVar;
+            await DisplayAlert("Okay", addToPlaylistToBeAdded.SongName, "Alright");
             PageAddToPlaylist.IsVisible = true;
             List<AddToPlaylistCustomClass> sourceList = new List<AddToPlaylistCustomClass>();
             int i = 0;
@@ -1016,7 +1034,7 @@ namespace RudymentaryNet8
         private async void RemoveFromPlaylistContext_Clicked(object sender, EventArgs e)
         {
             var menuFlyout = (MenuFlyoutItem)sender;
-            var item = (SongData)menuFlyout.Parent.BindingContext;
+            var item = (SongData)menuFlyout.Parent.Parent.BindingContext;
             var albumData = (AlbumData)AlbumPageAlbumDataView.BindingContext;
             if (!albumData.IsPlaylist)
             {
@@ -1049,13 +1067,22 @@ namespace RudymentaryNet8
         }
         private async void AddToPlaylist_SelectedPlaylist(object sender, TappedEventArgs e)
         {
-            var button = (Frame)sender;
-            AddToPlaylistCustomClass playlistInformation = (AddToPlaylistCustomClass)button.BindingContext;
-            addToPlaylistToBeAdded.RenderNumber = allSavedPlaylistData[playlistInformation.PlaylistIndex].Songs.Count + 1;
-            allSavedPlaylistData[playlistInformation.PlaylistIndex].Songs.Add(addToPlaylistToBeAdded);
+            try
+            {
+                var button = (Frame)sender;
+                AddToPlaylistCustomClass playlistInformation = (AddToPlaylistCustomClass)button.BindingContext;
+                //await DisplayAlert("All saved playlist", allSavedPlaylistData.Count.ToString(), "Okay");
+                //await DisplayAlert("ID", playlistInformation.PlaylistIndex.ToString(), "Alright");
+                addToPlaylistToBeAdded.RenderNumber = allSavedPlaylistData[playlistInformation.PlaylistIndex].Songs.Count + 1;
+                allSavedPlaylistData[playlistInformation.PlaylistIndex].Songs.Add(addToPlaylistToBeAdded);
 
-            PageAddToPlaylist.IsVisible = false;
-            AddToPlaylist_SaveToFile();
+                PageAddToPlaylist.IsVisible = false;
+                AddToPlaylist_SaveToFile();
+            } catch (Exception ex)
+            {
+
+            }
+           
             //await DisplayAlert("ID", playlistInformation.PlaylistIndex.ToString(), "Alright");
         }
         private void AddToPlaylist_SaveToFile()
@@ -1118,6 +1145,7 @@ namespace RudymentaryNet8
 
         private void UniversalMediaNextTrackButton_Clicked(object sender, EventArgs e)
         {
+            SongSkippedAnimationCompilation();
             UniversalMediaElementPlayer_MediaEnded(new object(), new EventArgs());
         }
 
@@ -1346,6 +1374,19 @@ namespace RudymentaryNet8
             //LyricsListLabelContainer.Add(breakLine);
 
         }
+        private void SongSkippedAnimationCompilation()
+        {
+            //Animation imageFadeFromLeft = new Animation(v => UniversalMediaPlayer_AlbumArtImage.Opacity = v, 0, 1, Easing.SinIn);
+            Animation songNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation songFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.TranslationX = v, 25, 0, Easing.CubicIn);
+            Animation artistNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation artistFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.TranslationX = v, 25, 0, Easing.CubicIn);
+            //imageFadeFromLeft.Commit(this, "albumImageSkipFade", 16, 1000);
+            songNameFade.Commit(this, "songNameSkipFade", 16, 500);
+            artistNameFade.Commit(this, "artistNameSkipFade", 16, 500);
+            songFromLeft.Commit(this, "songNameFromLeft", 16, 500);
+            artistFromLeft.Commit(this, "artistNameFromLeft", 16, 500);
 
+        }
     }
 }
