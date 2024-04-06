@@ -189,6 +189,7 @@ namespace RudymentaryNet8
             PageSettings.IsVisible = false;
             GC.Collect();
             GC.WaitForPendingFinalizers();
+            AlbumPageOpenedAnimationCompilation();
         }
 
 
@@ -905,7 +906,7 @@ namespace RudymentaryNet8
                     //Image image = new Image();
                     //image.Source =ImageSource.FromUri(new Uri(largeImagePath));
                     //SliderPosition.Text = UniversalMediaSlider.Value.ToString() + "\n" + UniversalMediaElementPlayer.Position.TotalSeconds.ToString() + "\n" + UniversalMediaElementPlayer.Duration.TotalSeconds.ToString();
-
+                    //client.
                     client.SetPresence(new RichPresence()
                     {
                         State = timerString,
@@ -1156,6 +1157,7 @@ namespace RudymentaryNet8
                 if (songDataQueueIndex > 0)
                 {
                     songDataQueueIndex--;
+                    SongBackAnimationCompilation();
                     UniversalMediaElementPlayer_NewSongSelected(songDataQueue[songDataQueueIndex]);
                 }
                 
@@ -1378,14 +1380,35 @@ namespace RudymentaryNet8
         {
             //Animation imageFadeFromLeft = new Animation(v => UniversalMediaPlayer_AlbumArtImage.Opacity = v, 0, 1, Easing.SinIn);
             Animation songNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.Opacity = v, 0, 1, Easing.CubicIn);
-            Animation songFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.TranslationX = v, 25, 0, Easing.CubicIn);
+            Animation songFromRight = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.TranslationX = v, 25, 0, Easing.CubicIn);
             Animation artistNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.Opacity = v, 0, 1, Easing.CubicIn);
-            Animation artistFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.TranslationX = v, 25, 0, Easing.CubicIn);
+            Animation artistFromRight = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.TranslationX = v, 25, 0, Easing.CubicIn);
             //imageFadeFromLeft.Commit(this, "albumImageSkipFade", 16, 1000);
             songNameFade.Commit(this, "songNameSkipFade", 16, 500);
             artistNameFade.Commit(this, "artistNameSkipFade", 16, 500);
-            songFromLeft.Commit(this, "songNameFromLeft", 16, 500);
-            artistFromLeft.Commit(this, "artistNameFromLeft", 16, 500);
+            songFromRight.Commit(this, "songNameFromRight", 16, 500);
+            artistFromRight.Commit(this, "artistNameFromRight", 16, 500);
+
+        }
+        private void SongBackAnimationCompilation()
+        {
+            Animation songNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation songFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.TranslationX = v, -25, 0, Easing.CubicIn);
+            Animation artistNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation artistFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.TranslationX = v, -25, 0, Easing.CubicIn);
+            songNameFade.Commit(this, "songNameSkipFade", 16, 500);
+            artistNameFade.Commit(this, "artistNameSkipFade", 16, 500);
+            songFromLeft.Commit(this, "songNameFromRight", 16, 500);
+            artistFromLeft.Commit(this, "artistNameFromRight", 16, 500);
+
+
+        }
+        private void AlbumPageOpenedAnimationCompilation()
+        {
+            Animation enterTopDown = new Animation(v => AlbumPageExitButton.TranslationY = v, -25, 0, Easing.CubicOut);
+            Animation fadeTopDown = new Animation(v => AlbumPageExitButton.Opacity = v, 0, 1, Easing.CubicOut);
+            enterTopDown.Commit(this, "albumPageTopEnter", 16, 250);
+            fadeTopDown.Commit(this, "albumPageTopFade", 16, 250);
 
         }
     }
