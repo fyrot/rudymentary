@@ -14,6 +14,7 @@ using System.Collections.Immutable;
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+//using Android
 
 namespace RudymentaryNet8
 {
@@ -78,7 +79,8 @@ namespace RudymentaryNet8
             SettingsGetImageReferenceTest();
             BindableLayout.SetItemsSource(HomeAlbumsCollection, allSavedAlbumData);
             HomePlaylistsCollection.ItemsSource = allSavedPlaylistData;
-
+           
+            //UniversalMediaElementPlayer_NewSongSelected(new SongData { AlbumName="GT7"})
         }
 
         internal class FolderClass
@@ -260,6 +262,7 @@ namespace RudymentaryNet8
         {
             try
             {
+                
                 FolderPickerResult folderSelected = await FolderPicker.PickAsync(default);
                
                 if (folderSelected.IsSuccessful == false) { return; }
@@ -271,6 +274,7 @@ namespace RudymentaryNet8
                 }
                 newFolders.Add(folderSelected.Folder.Path);
                 File.WriteAllLines(foldersTxtPath, newFolders.Distinct().ToArray());
+                await DisplayAlert("Folders", string.Join(",", newFolders), "Thanks again");
                 SettingsFolderCollection.ItemsSource = SettingsGetFolders();
                 SettingsGetAlbumsToSongs(new object(), new EventArgs());
                
@@ -361,15 +365,40 @@ namespace RudymentaryNet8
             //SettingsGetAlbumsToSongs(new object(), new EventArgs());
             return returnFolders;
         }
-        private void SettingsGetAlbumsToSongs_DirectoryHelper(string givenPath)
+        private async void SettingsGetAlbumsToSongs_DirectoryHelper(string givenPath)
         {
-            string[] filesInDirectory = Directory.GetFiles(givenPath);
+            try
+            {
+
+                /* if (!Android.OS.Environment.IsExternalStorageManager)
+                {
+                    Intent intent = new Intent(
+                    Android.Provider.Settings.ActionManageAppAllFilesAccessPermission,
+                    Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
+
+                    intent.AddFlags(ActivityFlags.NewTask);
+
+                    Application.Context.StartActivity(intent);
+                } */
+                PermissionStatus canread = await Permissions.CheckStatusAsync<Permissions.StorageRead>();
+                PermissionStatus canwrite = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
+                if (canread == PermissionStatus.Denied)
+                {
+                    canread = await Permissions.RequestAsync<Permissions.StorageRead>();
+                }
+                //await DisplayAlert("Can it Write", canwrite.ToString(), "It can write?");
+                //await DisplayAlert("Can It Read", canread.ToString(), "It can read?");
+                string[] filesInDirectory = Directory.EnumerateFiles(givenPath).ToArray();
+
+               // await DisplayAlert("Type", (filesInDirectory == null).ToString(), "Woah okay");
+             //await DisplayAlert("files in directory", filesInDirectory[0], "Brooo");
             foreach (string f in filesInDirectory)
             {
                 foreach (string ending in supportedAudioCodecs)
                 {
                     if (f.EndsWith(ending))
                     {
+                        //await DisplayAlert("song found", f, "Okay");
                         songPathToNameTuples.Add(Tuple.Create(f, f.Substring(givenPath.Length + 1)));
                     }
                 }
@@ -380,21 +409,28 @@ namespace RudymentaryNet8
             {
                 SettingsGetAlbumsToSongs_DirectoryHelper(d);
             }
+            } catch (Exception ex)
+            {
+                await DisplayAlert("Exception encounter", ex.Message, "Ohh I See");
+            }
+            
 
         }
         private async void SettingsGetAlbumsToSongs(object sender, EventArgs args)
         {
             allSavedAlbumData.Clear();
+            //await DisplayAlert("App project directory", Path.Combine(System.AppContext.BaseDirectory, "..", "AndroidProject"), "Thanks");
             //SettingsIndexingFoldersActivityIndicator.IsRunning = true;
             Dictionary<string, List<Tuple<string, string>>> albumsToSongs = new Dictionary<string, List<Tuple<string, string>>>();
             string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
             if (!File.Exists(foldersTxtPath))
             {
-                //await DisplayAlert("Not existing", foldersTxtPath, "Alright");
+                await DisplayAlert("Not existing", foldersTxtPath, "Alright");
                 return;
             }
             foreach (string p in File.ReadAllLines(foldersTxtPath))
             {
+               // await DisplayAlert("folder read", p, "Next");
                 SettingsGetAlbumsToSongs_DirectoryHelper(p);
             }
             songPathToNameTuples = songPathToNameTuples.Distinct().ToList();
@@ -557,11 +593,12 @@ namespace RudymentaryNet8
             BindableLayout.SetItemsSource(HomeAlbumsCollection, allAlbums);
             GC.Collect();
             //await DisplayAlert("Epic Dictionary Gameplay", serializedJson, "OK Great");
+            //await DisplayAlert("Album Data", allSavedAlbumData.ToString(), "Thanks, finally");
         }
         private async void SettingsGetImageReferenceTest()
         {
             //allSavedAlbumData.Clear();
-
+            //await DisplayAlert("Does it exist", Directory.Exists("/storage/emulated/0/TestMusicFolder").ToString(), "Thanks");
             Dictionary<string, List<Tuple<string, string>>> albumsToSongs = new Dictionary<string, List<Tuple<string, string>>>();
             string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
             if (!File.Exists(foldersTxtPath))
