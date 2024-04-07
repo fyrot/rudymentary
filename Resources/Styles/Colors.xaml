@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -30,15 +30,16 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
-    <Color x:Key="UniversalMediaPlayerThumbColor">#DA70D6</Color>
+    <Color x:Key="UniversalMediaPlayerThumbColor">#FFA500</Color>
     <Color x:Key="UniversalMediaPlayerIconTextColor">#000000</Color>
     <Color x:Key="UniversalMediaPlayerIconBackgroundColor">#FFFFFF</Color>
-    <Color x:Key="UniversalMediaPlayerBackgroundColor">#3F3F3F</Color>
+    <Color x:Key="UniversalMediaPlayerBackgroundColor">#181818</Color>
     <Color x:Key="UniversalMediaPlayerAlbumArtBackgroundColor">#181818</Color>
     <Color x:Key="NavigationIconBarBackgroundColor">#000000</Color>
     <Color x:Key="HomePageBackgroundColor">#1F1F1F</Color>
-    <Color x:Key="AlbumPageBackgroundColor">#2F2F2F</Color>
-    <Color x:Key="UniversalMediaPlayerDownloadIconColor">#7C7C7C</Color>
+    <Color x:Key="AlbumPageBackgroundColor">#1F1F1F</Color>
+    <Color x:Key="SettingsPageBackgroundColor">#1F1F1F</Color>
+    <Color x:Key="UniversalMediaPlayerDownloadIconColor">#7C7C7C</Color> <!-- this is 'deprecated', i think -->
     <Color x:Key="ShellBackgroundColor">#333333</Color>
     <Color x:Key="Yellow100Accent">#F7B548</Color>
     <Color x:Key="Yellow200Accent">#FFD590</Color>
