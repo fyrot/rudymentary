@@ -1,27 +1,28 @@
 using CommunityToolkit.Maui.Converters;
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Maui.Views;
+//using System.Text.Json.Serialization;
+using DiscordRPC; // used for convenient, short-hand Discord platform integration; non-essential to function
+using GTranslate;
+using GTranslate.Translators; // used for translation/transliteration using different services; better than calling through a REST API as private keys are often provided in the package/results are scraped through free or inexpensive methods
+using Microsoft.Maui.Platform;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
 //using Microsoft.Maui.Graphics.Win2D;
 using System.Text.Json;
-//using System.Text.Json.Serialization;
-using DiscordRPC; // used for convenient, short-hand Discord platform integration; non-essential to function
-using GTranslate.Translators; // used for translation/transliteration using different services; better than calling through a REST API as private keys are often provided in the package/results are scraped through free or inexpensive methods
-using GTranslate;
-using Microsoft.Maui.Platform;
-using System.Collections.Immutable;
-using CommunityToolkit.Maui.Views;
-using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+
 //using Android
 
-namespace RudymentaryNet8
+namespace RudymentaryMobile
 {
     public partial class MainPage : ContentPage
     {
-        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONIDHERE"); // actual api/application id omitted
-        
+        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONID"); // actual api/application id omitted
+
         int count = 0;
         string[] supportedAudioCodecs = { ".mp3", ".flac" };
         string abcDEF = "abcDEF";
@@ -79,7 +80,7 @@ namespace RudymentaryNet8
             SettingsGetImageReferenceTest();
             BindableLayout.SetItemsSource(HomeAlbumsCollection, allSavedAlbumData);
             HomePlaylistsCollection.ItemsSource = allSavedPlaylistData;
-           
+            //LinearGradientBrush homeBackground = new LinearGradientBrush { GradientStops = { }}
             //UniversalMediaElementPlayer_NewSongSelected(new SongData { AlbumName="GT7"})
         }
 
@@ -132,7 +133,7 @@ namespace RudymentaryNet8
 
         }
 
-        private void HomePageButton_Clicked(object sender, EventArgs e)
+        public void HomePageButton_Clicked(object sender, EventArgs e)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -147,7 +148,7 @@ namespace RudymentaryNet8
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
-        private void SearchPageButton_Clicked(object sender, EventArgs e)
+        public void SearchPageButton_Clicked(object sender, EventArgs e)
         {
             PageHome.IsVisible = false;
             PageSearch.IsVisible = true;
@@ -212,7 +213,7 @@ namespace RudymentaryNet8
             {
                 //await File.WriteAllBytesAsync(currentArtPngPath, new byte[0]);
             }
-            
+
             UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[item.ImageKey];
             UniversalMediaElementPlayer_NewSongSelected(item);
             currentAlbumPlayed = overallAlbum.AlbumName;
@@ -227,7 +228,7 @@ namespace RudymentaryNet8
             PageCreatePlaylist.IsVisible = true;
             PageSettings.IsVisible = false;
         }
-        private void SettingsPageButton_Clicked(object sender, EventArgs args)
+        public void SettingsPageButton_Clicked(object sender, EventArgs args)
         {
             PageHome.IsVisible = false;
             PageSearch.IsVisible = false;
@@ -262,9 +263,9 @@ namespace RudymentaryNet8
         {
             try
             {
-                
+
                 FolderPickerResult folderSelected = await FolderPicker.PickAsync(default);
-               
+
                 if (folderSelected.IsSuccessful == false) { return; }
                 string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
                 List<string> newFolders = new List<string>();
@@ -277,12 +278,12 @@ namespace RudymentaryNet8
                 await DisplayAlert("Folders", string.Join(",", newFolders), "Thanks again");
                 SettingsFolderCollection.ItemsSource = SettingsGetFolders();
                 SettingsGetAlbumsToSongs(new object(), new EventArgs());
-               
+
                 await DisplayAlert("Success", "Folder successfully added", "Thanks");
             }
             catch (Exception ex)
             {
-                
+
                 await DisplayAlert("Error encountered!", ex.Message, "Alright");
             }
         }
@@ -332,7 +333,7 @@ namespace RudymentaryNet8
             var item = (FolderClass)button.BindingContext;
             string ignorePath = item.FolderPath;
             string foldersTxtPath = Path.Combine(FileSystem.Current.AppDataDirectory, "folders.txt");
-           
+
             List<string> newFolders = new List<string>();
             foreach (string p in File.ReadAllLines(foldersTxtPath))
             {
@@ -343,7 +344,7 @@ namespace RudymentaryNet8
             SettingsFolderCollection.ItemsSource = SettingsGetFolders();
             SettingsGetAlbumsToSongs(new object(), new EventArgs());
             SettingsUpdatePlaylistsToSongs();
-            
+
             await DisplayAlert("Success", ignorePath + " was removed.", "Alright");
 
         }
@@ -386,34 +387,36 @@ namespace RudymentaryNet8
                 {
                     canread = await Permissions.RequestAsync<Permissions.StorageRead>();
                 }
+
                 //await DisplayAlert("Can it Write", canwrite.ToString(), "It can write?");
                 //await DisplayAlert("Can It Read", canread.ToString(), "It can read?");
                 string[] filesInDirectory = Directory.EnumerateFiles(givenPath).ToArray();
 
-               // await DisplayAlert("Type", (filesInDirectory == null).ToString(), "Woah okay");
-             //await DisplayAlert("files in directory", filesInDirectory[0], "Brooo");
-            foreach (string f in filesInDirectory)
-            {
-                foreach (string ending in supportedAudioCodecs)
+                // await DisplayAlert("Type", (filesInDirectory == null).ToString(), "Woah okay");
+                //await DisplayAlert("files in directory", filesInDirectory[0], "Brooo");
+                foreach (string f in filesInDirectory)
                 {
-                    if (f.EndsWith(ending))
+                    foreach (string ending in supportedAudioCodecs)
                     {
-                        //await DisplayAlert("song found", f, "Okay");
-                        songPathToNameTuples.Add(Tuple.Create(f, f.Substring(givenPath.Length + 1)));
+                        if (f.EndsWith(ending))
+                        {
+                            //await DisplayAlert("song found", f, "Okay");
+                            songPathToNameTuples.Add(Tuple.Create(f, f.Substring(givenPath.Length + 1)));
+                        }
                     }
-                }
 
+                }
+                string[] directoriesInDirectory = Directory.GetDirectories(givenPath);
+                foreach (string d in directoriesInDirectory)
+                {
+                    SettingsGetAlbumsToSongs_DirectoryHelper(d);
+                }
             }
-            string[] directoriesInDirectory = Directory.GetDirectories(givenPath);
-            foreach (string d in directoriesInDirectory)
-            {
-                SettingsGetAlbumsToSongs_DirectoryHelper(d);
-            }
-            } catch (Exception ex)
+            catch (Exception ex)
             {
                 await DisplayAlert("Exception encounter", ex.Message, "Ohh I See");
             }
-            
+
 
         }
         private async void SettingsGetAlbumsToSongs(object sender, EventArgs args)
@@ -430,7 +433,7 @@ namespace RudymentaryNet8
             }
             foreach (string p in File.ReadAllLines(foldersTxtPath))
             {
-               // await DisplayAlert("folder read", p, "Next");
+                // await DisplayAlert("folder read", p, "Next");
                 SettingsGetAlbumsToSongs_DirectoryHelper(p);
             }
             songPathToNameTuples = songPathToNameTuples.Distinct().ToList();
@@ -514,14 +517,15 @@ namespace RudymentaryNet8
                     //TimeSpan[] lyricTimings = new TimeSpan[0];
                     if (Path.Exists(tPathName.Replace(".mp3", ".lrc")))
                     {
-                        
+
                         List<string> foundLyrics = new List<string>();
                         List<TimeSpan> temporaryTimings = new List<TimeSpan>();
                         foreach (string l in File.ReadLines(tPathName.Replace(".mp3", ".lrc")))
                         {
                             if (l.Length < 2) { continue; }
-                            if (char.IsDigit(l[1])) {
-                                foundLyrics.Add(l.Substring(10)); 
+                            if (char.IsDigit(l[1]))
+                            {
+                                foundLyrics.Add(l.Substring(10));
                                 string timespanToBeParsed = l.Substring(1, 8); // 00:00.00
                                 double timespanInSeconds = (int.Parse(timespanToBeParsed.Substring(0, 2)) * 60) + (int.Parse(timespanToBeParsed.Substring(3, 2))) + (int.Parse(timespanToBeParsed.Substring(6, 2)) / 100);
                                 temporaryTimings.Add(TimeSpan.FromSeconds(timespanInSeconds));
@@ -688,7 +692,7 @@ namespace RudymentaryNet8
                     string tagFileLyrics = tagFile.Tag.Lyrics;
                     if (tagFileLyrics == null) { tagFileLyrics = ""; }
                     TimeSpan[] lyricTimings = null;
-                    SongData toAppendSongData = new SongData { SongName = tagFileSongName, ArtistName = tagFileArtistName, AlbumName = k, Duration = tagFileDuration, DurationString = string.Format("{0}:{1}", formatTimeSpanData(tagFileDuration.Minutes.ToString()), formatTimeSpanData(tagFileDuration.Seconds.ToString())), SongPath = tPathName, TrackNumber = tagFileTrackNumber, RenderNumber = -1, ImageKey = k, Lyrics = new Dictionary<string, string> { { "Original", tagFileLyrics } }, LyricTimings=lyricTimings, DiscNo = tagFileDiscNumber };
+                    SongData toAppendSongData = new SongData { SongName = tagFileSongName, ArtistName = tagFileArtistName, AlbumName = k, Duration = tagFileDuration, DurationString = string.Format("{0}:{1}", formatTimeSpanData(tagFileDuration.Minutes.ToString()), formatTimeSpanData(tagFileDuration.Seconds.ToString())), SongPath = tPathName, TrackNumber = tagFileTrackNumber, RenderNumber = -1, ImageKey = k, Lyrics = new Dictionary<string, string> { { "Original", tagFileLyrics } }, LyricTimings = lyricTimings, DiscNo = tagFileDiscNumber };
                     allSongNameToData.Add(Tuple.Create(tagFileSongName, toAppendSongData));
                     onlySongsList.Add(toAppendSongData);
                 }
@@ -812,16 +816,17 @@ namespace RudymentaryNet8
                     albumArtists = givenSongData.ArtistName;
                 }
                 client.ClearPresence();
-                
+
                 UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[givenSongData.ImageKey];
                 UniversalMediaPlayer_CurrentlyPlayingName.Text = givenSongData.SongName;
                 UniversalMediaPlayer_CurrentlyPlayingArtists.Text = givenSongData.ArtistName;
                 ToolTipProperties.SetText(UniversalMediaPlayer_CurrentlyPlayingName, givenSongData.SongName);
-                
+
                 UniversalMediaElementPlayer.Stop();
                 UniversalMediaElementPlayer.Source = givenPath;
                 UniversalMediaElementPlayer.Play();
-                if (UniversalMediaPlayerBar.IsVisible == false) {
+                if (UniversalMediaPlayerBar.IsVisible == false)
+                {
                     // animated fade-in of player bar when first song is selected
                     UniversalMediaPlayerBar.IsVisible = true;
                     UniversalMediaPlayerBar.Opacity = 1; // temporary
@@ -831,7 +836,7 @@ namespace RudymentaryNet8
                     Animation barSizeGrowthRowDefinition = new Animation(v => UniversalMediaPlayerBarRowDefinition.Height = v, 0, 100);
                     barSizeGrowth.Commit(this, "PlayerBarGrowth", 16, 1000, Easing.CubicOut);
                     barSizeGrowthRowDefinition.Commit(this, "PlayerBarGrowthRowDefinition", 16, 1000, Easing.CubicOut);
-                    
+
                     //UniversalMediaPlayerBarRowDefinition.Height = 100; 
                     //UniversalMediaPlayerBar.HeightRequest = 100; 
                     //UniversalMediaPlayerBar.IsVisible = true; 
@@ -839,7 +844,7 @@ namespace RudymentaryNet8
                     // opacity animation i think would make it too confusing with the slide in
                 }
                 currentlyPlayingSongData = givenSongData;
-                
+
                 if (LyricsListBottomContainer.Children.Count > 0) { LyricsListBottomContainer.Clear(); }
                 if (givenSongData.Lyrics["Original"] != "")
                 {
@@ -911,11 +916,13 @@ namespace RudymentaryNet8
                     {
                         if (iterator < currentlyPlayingSongData.LyricTimings.Length)
                         {
-                            if (umsPositionTimeSpan > currentlyPlayingSongData.LyricTimings[iterator]) {
+                            if (umsPositionTimeSpan > currentlyPlayingSongData.LyricTimings[iterator])
+                            {
                                 //line.TextColor = Color.Parse("White");
                                 line.FadeTo(1.0);
                             }
-                            else {
+                            else
+                            {
                                 //line.TextColor = Color.Parse("Gray"); 
                                 line.Opacity = 0.5;
                             }
@@ -1116,11 +1123,12 @@ namespace RudymentaryNet8
 
                 PageAddToPlaylist.IsVisible = false;
                 AddToPlaylist_SaveToFile();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }
-           
+
             //await DisplayAlert("ID", playlistInformation.PlaylistIndex.ToString(), "Alright");
         }
         private void AddToPlaylist_SaveToFile()
@@ -1197,7 +1205,7 @@ namespace RudymentaryNet8
                     SongBackAnimationCompilation();
                     UniversalMediaElementPlayer_NewSongSelected(songDataQueue[songDataQueueIndex]);
                 }
-                
+
             }
             else
             {
@@ -1375,14 +1383,15 @@ namespace RudymentaryNet8
                 // separate if statement to preserve original formatting on normal lyrics while accounting for formatting given through transliteration   
                 lyricLabel.ReplaceLineEndings();
                 string[] lines = lyricLabel.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.None);
-                
+
                 lyricsByLine = lines;
                 //await DisplayAlert("How Many Lines?", lines.Length.ToString(), "Cool");
             }
             //await DisplayAlert("number of lyrics", lyricsByLine.Length.ToString(), "Thanks");
             Color defaultTextColor = Color.Parse("White");
             double textOpacity = 1;
-            if (currentlyPlayingSongData.LyricTimings != null) {
+            if (currentlyPlayingSongData.LyricTimings != null)
+            {
                 //defaultTextColor = Color.Parse("Gray"); 
                 textOpacity = 0.5;
             }
@@ -1398,14 +1407,14 @@ namespace RudymentaryNet8
                 MainThread.BeginInvokeOnMainThread(new Action(() =>
                 {
                     //UniversalMediaElementPlayer.SeekTo(currentlyPlayingSongData.LyricTimings[automatedIdx]);
-                    UniversalMediaSlider.Value = currentlyPlayingSongData.LyricTimings[automatedIdx].TotalSeconds/currentlyPlayingSongData.Duration.TotalSeconds;
+                    UniversalMediaSlider.Value = currentlyPlayingSongData.LyricTimings[automatedIdx].TotalSeconds / currentlyPlayingSongData.Duration.TotalSeconds;
                     UniversalMediaElementPlayer.SeekTo(currentlyPlayingSongData.LyricTimings[automatedIdx]);
-                    
+
                 }));
             };
             foreach (string l in lyricsByLine)
             {
-                Label lineToBeAdded = new Label { Text = l, FontSize = (double)convertToLarge.ConvertFromString("Large"), FontAttributes = FontAttributes.Bold, Opacity=textOpacity, TextColor = defaultTextColor, HorizontalTextAlignment = TextAlignment.Center, VerticalTextAlignment = TextAlignment.Center, AutomationId = automateID.ToString() };
+                Label lineToBeAdded = new Label { Text = l, FontSize = (double)convertToLarge.ConvertFromString("Large"), FontAttributes = FontAttributes.Bold, Opacity = textOpacity, TextColor = defaultTextColor, HorizontalTextAlignment = TextAlignment.Center, VerticalTextAlignment = TextAlignment.Center, AutomationId = automateID.ToString() };
                 if (currentlyPlayingSongData.LyricTimings != null) { lineToBeAdded.GestureRecognizers.Add(lyricTapped); }
                 LyricsListLabelContainer.Add(lineToBeAdded);
                 automateID++;
@@ -1446,6 +1455,31 @@ namespace RudymentaryNet8
             Animation fadeTopDown = new Animation(v => AlbumPageExitButton.Opacity = v, 0, 1, Easing.CubicOut);
             enterTopDown.Commit(this, "albumPageTopEnter", 16, 250);
             fadeTopDown.Commit(this, "albumPageTopFade", 16, 250);
+
+        }
+
+        private void OpenCurrentlyPlayingScreen(object sender, TappedEventArgs e)
+        {
+            PageCurrentlyPlaying.IsVisible = true;
+            //int a = PageCurrentlyPlaying.TranslationX;
+            double windowHeight = DeviceDisplay.MainDisplayInfo.Height;
+
+            Animation slideFromBottom = new Animation(v => PageCurrentlyPlaying.TranslationY = v, windowHeight, 0, Easing.CubicOut);
+            slideFromBottom.Commit(this, "currentlyPlayingBottom", 16, 300);
+        }
+        
+
+        private void CloseCurrentlyPlayingScreen(object sender, TappedEventArgs e)
+        {
+            //PageCurrentlyPlaying.IsVisible = false;
+            double windowHeight = DeviceDisplay.MainDisplayInfo.Height;
+
+            Animation slideFromScreen = new Animation(v => PageCurrentlyPlaying.TranslationY = v, 0, windowHeight, Easing.CubicOut);
+            slideFromScreen.Commit(this, "currentlyPlayingExit", 16, 300, finished: (val, canceled) =>
+            {
+                if (!canceled) { PageCurrentlyPlaying.IsVisible = false; }
+            });
+            
 
         }
     }
