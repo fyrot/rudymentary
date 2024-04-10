@@ -80,6 +80,8 @@ namespace RudymentaryMobile
             SettingsGetImageReferenceTest();
             BindableLayout.SetItemsSource(HomeAlbumsCollection, allSavedAlbumData);
             HomePlaylistsCollection.ItemsSource = allSavedPlaylistData;
+            //UniversalMediaPlayStopButtonCurrentlyPlayingVer.SetBinding(Microsoft.Maui.Controls.Button.TextProperty, new Binding(nameof(UniversalMediaPlayStopButton.Text)));
+            
             //LinearGradientBrush homeBackground = new LinearGradientBrush { GradientStops = { }}
             //UniversalMediaElementPlayer_NewSongSelected(new SongData { AlbumName="GT7"})
         }
@@ -796,11 +798,13 @@ namespace RudymentaryMobile
             if (UniversalMediaElementPlayer.CurrentState == CommunityToolkit.Maui.Core.Primitives.MediaElementState.Playing)
             {
                 UniversalMediaPlayStopButton.Text = "|>";
+                
                 UniversalMediaElementPlayer.Pause();
             }
             else
             {
                 UniversalMediaPlayStopButton.Text = "||";
+                //UniversalMediaPlayStopButtonCurrentlyPlayingVer.Text = "||";
                 UniversalMediaElementPlayer.Play();
             }
 
@@ -1464,7 +1468,7 @@ namespace RudymentaryMobile
             //int a = PageCurrentlyPlaying.TranslationX;
             double windowHeight = DeviceDisplay.MainDisplayInfo.Height;
 
-            Animation slideFromBottom = new Animation(v => PageCurrentlyPlaying.TranslationY = v, windowHeight, 0, Easing.CubicOut);
+            Animation slideFromBottom = new Animation(v => PageCurrentlyPlaying.TranslationY = v, windowHeight, 0, Easing.CubicInOut);
             slideFromBottom.Commit(this, "currentlyPlayingBottom", 16, 300);
         }
         
@@ -1474,13 +1478,22 @@ namespace RudymentaryMobile
             //PageCurrentlyPlaying.IsVisible = false;
             double windowHeight = DeviceDisplay.MainDisplayInfo.Height;
 
-            Animation slideFromScreen = new Animation(v => PageCurrentlyPlaying.TranslationY = v, 0, windowHeight, Easing.CubicOut);
+            Animation slideFromScreen = new Animation(v => PageCurrentlyPlaying.TranslationY = v, 0, windowHeight, Easing.CubicInOut);
             slideFromScreen.Commit(this, "currentlyPlayingExit", 16, 300, finished: (val, canceled) =>
             {
                 if (!canceled) { PageCurrentlyPlaying.IsVisible = false; }
             });
             
 
+        }
+
+        private void UniversalMediaPlayerBarSwipeLeft(object sender, SwipedEventArgs e)
+        {
+            UniversalMediaNextTrackButton_Clicked(new object(), new EventArgs());
+        }
+        private void UniversalMediaPlayerBarSwipeRight(object sender, SwipedEventArgs e)
+        {
+            UniversalMediaPreviousTrackButton_Clicked(new object(), new EventArgs());
         }
     }
 }
