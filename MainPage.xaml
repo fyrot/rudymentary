@@ -6,10 +6,16 @@
              x:Class="RudymentaryMobile.MainPage"
              
              >
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource HomePageBackgroundColor}">
+            
+        </toolkit:StatusBarBehavior>
+    </ContentPage.Behaviors>
     <ContentPage.Resources>
         <local:KeyToImgSourceConverter x:Key="KeyToImgSource" />
+        
         <DataTemplate x:Key="SongDataTemplate">
-            <Frame Padding="10" IsClippedToBounds="True" Margin="10, 0, 10, 10" BackgroundColor="Black" CornerRadius="10">
+            <Frame Padding="10" IsClippedToBounds="True" Margin="10, 0, 10, 10" BackgroundColor="Black" CornerRadius="10" HeightRequest="40">
                 <FlyoutBase.ContextFlyout>
                     <MenuFlyout>
                         <MenuFlyoutItem Text="Add to playlist" Clicked="AddToPlaylistContext_Clicked"/>
@@ -21,10 +27,10 @@
                 </Frame.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto, 10,*,10,*,10,40">
 
-                    <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
-                    <Label Text="{Binding SongName}" Grid.Column="2"/>
-                    <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="4"/>
-                    <Label Text="{Binding DurationString}" Grid.Column="6" HorizontalTextAlignment="Center"/>
+                    <Label Text="{Binding RenderNumber, Mode=OneTime}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
+                    <Label Text="{Binding SongName, Mode=OneTime}" Grid.Column="2"/>
+                    <Label Text="{Binding ArtistName, Mode=OneTime}" TextColor="Gray" Grid.Column="4"/>
+                    <Label Text="{Binding DurationString, Mode=OneTime}" Grid.Column="6" HorizontalTextAlignment="Center"/>
                 </Grid>
 
             </Frame>
@@ -42,15 +48,15 @@
                 </Frame.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto, 10,*,10,*,10, 20, 10,40">
 
-                    <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
-                    <Label Text="{Binding SongName}" Grid.Column="2"/>
-                    <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="4"/>
+                    <Label Text="{Binding RenderNumber, Mode=OneTime}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" />
+                    <Label Text="{Binding SongName, Mode=OneTime}" Grid.Column="2"/>
+                    <Label Text="{Binding ArtistName, Mode=OneTime}" TextColor="Gray" Grid.Column="4"/>
                     <HorizontalStackLayout Grid.Column="6" HorizontalOptions="End">
                         <Label Text="🖸" TextColor="Gray"/>
-                        <Label Text="{Binding DiscNo}" TextColor="Gray"/>
+                        <Label Text="{Binding DiscNo, Mode=OneTime}" TextColor="Gray"/>
                     </HorizontalStackLayout>
 
-                    <Label Text="{Binding DurationString}" Grid.Column="8" HorizontalTextAlignment="Center"/>
+                    <Label Text="{Binding DurationString, Mode=OneTime}" Grid.Column="8" HorizontalTextAlignment="Center"/>
                 </Grid>
 
             </Frame>
@@ -68,40 +74,39 @@
                 </Frame.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto, 10, 54, 10,*,10,*,10,40">
 
-                    <Label Text="{Binding RenderNumber}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" VerticalTextAlignment="Center" />
+                    <Label Text="{Binding RenderNumber, Mode=OneTime}" TextColor="Gray" HorizontalTextAlignment="Center" Grid.Column="0" VerticalTextAlignment="Center" />
                     <Frame Grid.Column="2" Margin="0, 0, 0, 0" IsClippedToBounds="True" Padding="0"  CornerRadius="15">
-                        <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" />
+                        <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}, Mode=OneTime}" WidthRequest="54" HeightRequest="54" />
                     </Frame>
 
-                    <Label Text="{Binding SongName}" Grid.Column="4" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
-                    <Label Text="{Binding ArtistName}" TextColor="Gray" Grid.Column="6" VerticalTextAlignment="Center"/>
-                    <Label Text="{Binding DurationString}" Grid.Column="8" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                    <Label Text="{Binding SongName, Mode=OneTime}" Grid.Column="4" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
+                    <Label Text="{Binding ArtistName, Mode=OneTime}" TextColor="Gray" Grid.Column="6" VerticalTextAlignment="Center"/>
+                    <Label Text="{Binding DurationString, Mode=OneTime}" Grid.Column="8" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                 </Grid>
 
             </Frame>
         </DataTemplate>
+        <x:Double x:Key="AlbumTileScaler">0.6</x:Double>
     </ContentPage.Resources>
 
     <Grid>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <!-- make auto -->
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <ScrollView Grid.Column="0" BackgroundColor="{DynamicResource NavigationIconBarBackgroundColor}">
-            <VerticalStackLayout Spacing="30" Padding="20">
-                <Button Text="⌂" Clicked="HomePageButton_Clicked" Padding="10" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
-                <Button Text="⌕" Clicked="SearchPageButton_Clicked" Padding="10" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
-                <Button Text="⚙" Clicked="SettingsPageButton_Clicked" Padding="10" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
-
-            </VerticalStackLayout>
-        </ScrollView>
-        <Grid Grid.Column="1" BackgroundColor="#00000000">
+        
+    
+        <Grid BackgroundColor="#00000000">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="0" x:Name="UniversalMediaPlayerBarRowDefinition"/>
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <ContentView Grid.Row="2" BackgroundColor="{DynamicResource NavigationIconBarBackgroundColor}">
+                <FlexLayout JustifyContent="SpaceEvenly" HorizontalOptions="FillAndExpand"  Margin="5">
+                    <Button Text="⌂" Clicked="HomePageButton_Clicked" Padding="10" FlexLayout.Grow="1" BorderWidth="0" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" BackgroundColor="Transparent" FontAttributes="None"/>
+                    <Button Text="⌕" Clicked="SearchPageButton_Clicked" Padding="10" FlexLayout.Grow="1" BorderWidth="0" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" BackgroundColor="Transparent" FontAttributes="None"/>
+                    <Button Text="⚙" Clicked="SettingsPageButton_Clicked" Padding="10" FlexLayout.Grow="1" BorderWidth="0" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" BackgroundColor="Transparent" FontAttributes="None"/>
+
+                </FlexLayout>
+            </ContentView>
             <ScrollView x:Name="PageHome" BackgroundColor="{DynamicResource HomePageBackgroundColor}" Grid.Row="0" IsVisible="True">
                 <VerticalStackLayout Padding="20" Spacing="20">
                     <!--<Label Text="Home" HorizontalOptions="Center" VerticalOptions="Center"/> -->
@@ -112,7 +117,7 @@
                                 AlignItems="Start"
                                 AlignSelf="Start"
                                 Direction="Row"
-                                JustifyContent="Start"
+                                JustifyContent="SpaceEvenly"
                                 Wrap="Wrap">
 
                         <BindableLayout.ItemTemplate>
@@ -338,14 +343,7 @@
                 </ScrollView>
 
             </Grid>
-            <Grid x:Name="PageCurrentlyPlaying" Grid.RowSpan="2" Grid.Row="0" ColumnDefinitions="*, Auto, *" RowDefinitions="*, Auto, *" ZIndex="5" IsVisible="False" BackgroundColor="Red">
-                <Frame Grid.Row="1" Grid.Column="1">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="CloseCurrentlyPlayingScreen" NumberOfTapsRequired="1" />
-                    </Frame.GestureRecognizers>
-                    <Label Text="Go back" />
-                </Frame>
-            </Grid>
+            
             <!-- This is the settings page -->
             <ScrollView x:Name="PageSettings" Grid.Row="0" BackgroundColor="{DynamicResource HomePageBackgroundColor}" IsVisible="False">
 
@@ -390,74 +388,94 @@
 
             </ScrollView>
             <!-- This is the music bar -->
-            <ContentView Grid.Row="1" x:Name="UniversalMediaPlayerBar" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}" IsVisible="False" Opacity="0.01" HeightRequest="0" Padding="0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" ZIndex="2" VerticalOptions="Start" HorizontalOptions="Start">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OpenCurrentlyPlayingScreen" NumberOfTapsRequired="1" />
-                        </Grid.GestureRecognizers>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid ColumnDefinitions="100" WidthRequest="100" Grid.Column="0">
-                            <Image WidthRequest="100" Grid.Column="0" Source="download_svgrepo_comwhite.png" BackgroundColor="{DynamicResource UniversalMediaPlayerAlbumArtBackgroundColor}">
-
-                            </Image>
-                            <Image WidthRequest="100" Grid.Column="0" x:Name="UniversalMediaPlayer_AlbumArtImage" Loaded="Image_Loaded" />
-
+            <Grid x:Name="PageCurrentlyPlaying" Grid.RowSpan="3" Grid.Row="0"  ZIndex="5" IsVisible="False" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}">
+                
+                    
+                
+                <Grid ColumnDefinitions="1*, 18*, 1*" RowDefinitions="1*, 18*, 1*">
+                    
+                    <Grid Grid.Column="1" Grid.Row="1" RowDefinitions="Auto, Auto, Auto, Auto" RowSpacing="20">
+                        <Label Text="Go back" Grid.Row="0">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="CloseCurrentlyPlayingScreen" NumberOfTapsRequired="1" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <HorizontalStackLayout Grid.Row="1">
+                            <Button Text="|(" x:Name="UniversalMediaPreviousTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"  Clicked="UniversalMediaPreviousTrackButton_Clicked"  />
+                            <Button x:Name="UniversalMediaPlayStopButtonCurrentlyPlayingVer"  Text="{Binding Text, Source={x:Reference UniversalMediaPlayStopButton}}" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"  Clicked="UniversalMediaPlayStopButton_Clicked" />
+                            <Button Text=")|" x:Name="UniversalMediaNextTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Clicked="UniversalMediaNextTrackButton_Clicked" />
+                        </HorizontalStackLayout>
+                        <Grid  RowDefinitions="Auto,Auto" Grid.Row="2">
+                            <Slider x:Name="UniversalMediaSlider"  VerticalOptions="Center" HorizontalOptions="FillAndExpand" Grid.Row="0" MinimumTrackColor="{DynamicResource UniversalMediaPlayerThumbColor}"  ThumbColor="{DynamicResource UniversalMediaPlayerThumbColor}" MaximumTrackColor="White" DragCompleted="UniversalMediaSlider_DragCompleted" DragStarted="UniversalMediaSlider_DragStarted"/>
+                            <FlexLayout JustifyContent="SpaceBetween" Grid.Row="1" >
+                                <Label x:Name="UniversalMediaSlider_SongPosition" Text="--:--" VerticalTextAlignment="Center" VerticalOptions="Center" HorizontalOptions="Start" />
+                                <Label x:Name="UniversalMediaSlider_SongDuration" VerticalOptions="Center"  VerticalTextAlignment="Center" Text="--:--" HorizontalOptions="End"/>
+                            </FlexLayout>
+                            
                         </Grid>
-                        <Border Grid.Column="1" Stroke="#00000000" MinimumWidthRequest="0" StrokeThickness="0" Margin="-1" StrokeShape="RoundRectangle 0,25, 0, 25" MaximumWidthRequest="350">
-
-                            <Grid RowDefinitions="*,*" MinimumWidthRequest="0" MaximumWidthRequest="350" >
-                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingName" LineBreakMode="TailTruncation" Grid.Row="0" Padding="15, 0, 15, 0" VerticalOptions="End" />
-                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingArtists" LineBreakMode="TailTruncation" Grid.Row="1" Padding="15, 0, 15, 0" VerticalOptions="Start" FontSize="Body" TextColor="DarkGray" />
-                            </Grid>
-
-
-                        </Border>
-
-                    </Grid>
-                    <Grid Grid.Column="1" ZIndex="1" VerticalOptions="Center"  >
-                        <Grid RowDefinitions="*,*" >
-                            <HorizontalStackLayout Grid.Row="0" Spacing="20" HorizontalOptions="Center">
-                                <Button Text="|(" x:Name="UniversalMediaPreviousTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"  Clicked="UniversalMediaPreviousTrackButton_Clicked"  />
-                                <Button x:Name="UniversalMediaPlayStopButton"  Text="|>" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"  Clicked="UniversalMediaPlayStopButton_Clicked" />
-                                <Button Text=")|" x:Name="UniversalMediaNextTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Clicked="UniversalMediaNextTrackButton_Clicked" />
-
-                            </HorizontalStackLayout>
-                            <Grid Grid.Row="1" ColumnDefinitions="1.2*, Auto, 2*, Auto, 1.2*" >
-                                <Label x:Name="UniversalMediaSlider_SongPosition" Grid.Column="1" Text="--:--" Padding="10" VerticalTextAlignment="Center" VerticalOptions="Center" />
-
-                                <Slider x:Name="UniversalMediaSlider"  VerticalOptions="Center" HorizontalOptions="FillAndExpand" Grid.Column="2" MinimumTrackColor="{DynamicResource UniversalMediaPlayerThumbColor}"  ThumbColor="{DynamicResource UniversalMediaPlayerThumbColor}" MaximumTrackColor="White" DragCompleted="UniversalMediaSlider_DragCompleted" DragStarted="UniversalMediaSlider_DragStarted"/>
-
-
-                                <Label x:Name="UniversalMediaSlider_SongDuration" VerticalOptions="Center" Grid.Column="3" Padding="10" VerticalTextAlignment="Center" Text="--:--"/>
-
-                            </Grid>
-                            <toolkit:MediaElement x:Name="UniversalMediaElementPlayer" Source="" MaximumHeightRequest="0" MaximumWidthRequest="0" Volume="0.5" ShouldShowPlaybackControls="False" PositionChanged="UniversalMediaElementPlayer_PositionChanged" MediaEnded="UniversalMediaElementPlayer_MediaEnded" ShouldAutoPlay="True" IsVisible="False" />
-                        </Grid>
-
-                    </Grid>
-                    <Grid Grid.Column="2">
                         <HorizontalStackLayout HorizontalOptions="End"  VerticalOptions="Center" Margin="0, 0, 0, 15">
                             <Button Text="🎤" x:Name="UniversalMediaShowLyricsButton" Clicked="UniversalMediaElementPlayer_ShowLyricsClicked"  TextColor="White" Opacity="0.5" BackgroundColor="Transparent" BorderColor="Transparent" />
                             <Button Text="⇋" Clicked="UniversalMediaElementPlayer_ShuffleFlagClicked"  TextColor="White" Opacity="0.5" BackgroundColor="Transparent" BorderColor="Transparent"/>
                             <Button Text="⟳" Clicked="UniversalMediaElementPlayer_LoopFlagClicked" FontSize="20"  TextColor ="White" BackgroundColor="Transparent" Opacity="0.5" BorderColor="Transparent"/>
                             <Slider x:Name="UniversalMediaElementPlayer_VolumeSlider"  WidthRequest="100" DragCompleted="UniversalMediaElementPlayer_VolumeSlider_DragCompleted" Value="0.5" MaximumTrackColor="White" />
-                            <ContentView WidthRequest="10" HeightRequest="10" >
-                                <!-- "scuffed" margin-->
-                            </ContentView>
+
                         </HorizontalStackLayout>
+                    </Grid>
+                    
+                </Grid>
+                
+            </Grid>
+            <ContentView Grid.Row="1" x:Name="UniversalMediaPlayerBar" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}" IsVisible="False" Opacity="0.01" HeightRequest="0" Padding="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" ZIndex="2" VerticalOptions="Start"  HorizontalOptions="FillAndExpand">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OpenCurrentlyPlayingScreen" NumberOfTapsRequired="1"  />
+                           <!--#region  <SwipeGestureRecognizer Direction="Left" Swiped="UniversalMediaPlayerBarSwipeLeft" Threshold="250" />
+                            <SwipeGestureRecognizer Direction="Right" Swiped="UniversalMediaPlayerBarSwipeRight" Threshold="250"/>-->
+                        </Grid.GestureRecognizers>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            
+                        </Grid.ColumnDefinitions>
+                        
+                            <Grid Grid.Column="0" ColumnDefinitions="1*, 8*, 1*" RowDefinitions="1*, 8*, 1*" HeightRequest="100" WidthRequest="100" >
+                            <Border Grid.Column="1" Grid.Row="1" StrokeShape="RoundRectangle 25, 25, 0, 0" Stroke="Transparent" StrokeThickness="0">
+                                <Image  Source="download_svgrepo_comwhite.png" BackgroundColor="{DynamicResource UniversalMediaPlayerAlbumArtBackgroundColor}" />
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="1" StrokeShape="RoundRectangle 10, 10, 10, 10" Stroke="Transparent" StrokeThickness="0">
+                                <Image  x:Name="UniversalMediaPlayer_AlbumArtImage" Loaded="Image_Loaded">
+                                    <Image.Shadow>
+                                        <Shadow Brush="Black" Radius="5" Opacity="0.6" />
+                                    </Image.Shadow>
+                                </Image>
+                            </Border>
+                        </Grid>
+
+                        <Border Grid.Column="1" Stroke="#00000000" MinimumWidthRequest="0" StrokeThickness="0" StrokeShape="RoundRectangle 0,25, 0, 25" MaximumWidthRequest="350">
+                            <Grid RowDefinitions="*,*" MinimumWidthRequest="0" MaximumWidthRequest="350" >
+                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingName" LineBreakMode="TailTruncation" Grid.Row="0"  VerticalOptions="End" />
+                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingArtists" LineBreakMode="TailTruncation" Grid.Row="1"  VerticalOptions="Start" FontSize="Body" TextColor="DarkGray" />
+                            </Grid>
+                        </Border>
 
                     </Grid>
+                    <Grid Grid.Column="1"  ZIndex="1" VerticalOptions="Center" Padding="30"  >
+                        <Grid>
+                            <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+                                <Button x:Name="UniversalMediaPlayStopButton"  Text="|>" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"  Clicked="UniversalMediaPlayStopButton_Clicked" />
+                            </HorizontalStackLayout>
+                            
+                            <toolkit:MediaElement x:Name="UniversalMediaElementPlayer" Source="" MaximumHeightRequest="0" MaximumWidthRequest="0" Volume="0.5" ShouldShowPlaybackControls="False" PositionChanged="UniversalMediaElementPlayer_PositionChanged" MediaEnded="UniversalMediaElementPlayer_MediaEnded" ShouldAutoPlay="True" IsVisible="False" />
+                        </Grid>
+
+                    </Grid>
+                    
 
 
 
