@@ -87,6 +87,7 @@
             </Frame>
         </DataTemplate>
         <x:Double x:Key="AlbumTileScaler">0.6</x:Double>
+        <x:Double x:Key="UniversalMediaPlayerBar_RelativeSliderPosition">0.0</x:Double>
     </ContentPage.Resources>
 
     <Grid>
@@ -232,8 +233,8 @@
             </ScrollView>
             <ScrollView x:Name="PageSearch" Grid.Row="0" BackgroundColor="{DynamicResource HomePageBackgroundColor}" IsVisible="False">
                 <Grid ColumnDefinitions="50, *, 50">
-                    <Grid RowDefinitions="50, 5, *" Grid.Column="1">
-                        <SearchBar TextChanged="SearchSongSearchEntry_TextChanged" Grid.Row="0" Placeholder="Search.." />
+                    <Grid RowDefinitions="100, 5, *" Grid.Column="1">
+                        <SearchBar TextChanged="SearchSongSearchEntry_TextChanged" Grid.Row="0" Margin="25" Placeholder="Search.." />
                         <CollectionView x:Name="SearchSongSearchResults" Grid.Row="2" IsVisible="False">
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
@@ -387,25 +388,29 @@
 
 
             </ScrollView>
-            <!-- This is the music bar -->
+            <!-- mobile exclusive "currently playing" full-screen view -->
             <Grid x:Name="PageCurrentlyPlaying" Grid.RowSpan="3" Grid.Row="0"  ZIndex="5" IsVisible="False" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}">
                 
                     
                 
                 <Grid ColumnDefinitions="1*, 18*, 1*" RowDefinitions="1*, 18*, 1*">
                     
-                    <Grid Grid.Column="1" Grid.Row="1" RowDefinitions="Auto, Auto, Auto, Auto" RowSpacing="20">
+                    <Grid Grid.Column="1" Grid.Row="1" RowDefinitions="Auto, Auto, Auto, Auto, Auto" RowSpacing="20">
                         <Label Text="Go back" Grid.Row="0">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="CloseCurrentlyPlayingScreen" NumberOfTapsRequired="1" />
                             </Label.GestureRecognizers>
                         </Label>
-                        <HorizontalStackLayout Grid.Row="1">
+                        <VerticalStackLayout Grid.Row="1">
+                            <Label Text="{Binding Text, Source={x:Reference UniversalMediaPlayer_CurrentlyPlayingName}}" />
+                            <Label Text="{Binding Text, Source={x:Reference UniversalMediaPlayer_CurrentlyPlayingArtists}}" />
+                        </VerticalStackLayout>
+                        <HorizontalStackLayout Grid.Row="2">
                             <Button Text="|(" x:Name="UniversalMediaPreviousTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"  Clicked="UniversalMediaPreviousTrackButton_Clicked"  />
                             <Button x:Name="UniversalMediaPlayStopButtonCurrentlyPlayingVer"  Text="{Binding Text, Source={x:Reference UniversalMediaPlayStopButton}}" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"  Clicked="UniversalMediaPlayStopButton_Clicked" />
                             <Button Text=")|" x:Name="UniversalMediaNextTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Clicked="UniversalMediaNextTrackButton_Clicked" />
                         </HorizontalStackLayout>
-                        <Grid  RowDefinitions="Auto,Auto" Grid.Row="2">
+                        <Grid  RowDefinitions="Auto,Auto" Grid.Row="3">
                             <Slider x:Name="UniversalMediaSlider"  VerticalOptions="Center" HorizontalOptions="FillAndExpand" Grid.Row="0" MinimumTrackColor="{DynamicResource UniversalMediaPlayerThumbColor}"  ThumbColor="{DynamicResource UniversalMediaPlayerThumbColor}" MaximumTrackColor="White" DragCompleted="UniversalMediaSlider_DragCompleted" DragStarted="UniversalMediaSlider_DragStarted"/>
                             <FlexLayout JustifyContent="SpaceBetween" Grid.Row="1" >
                                 <Label x:Name="UniversalMediaSlider_SongPosition" Text="--:--" VerticalTextAlignment="Center" VerticalOptions="Center" HorizontalOptions="Start" />
@@ -425,8 +430,13 @@
                 </Grid>
                 
             </Grid>
+            <!-- This is the music bar -->
             <ContentView Grid.Row="1" x:Name="UniversalMediaPlayerBar" BackgroundColor="{DynamicResource UniversalMediaPlayerBackgroundColor}" IsVisible="False" Opacity="0.01" HeightRequest="0" Padding="0">
-                <Grid>
+                
+                <Grid RowDefinitions="5, Auto">
+                    <Grid Grid.Row="0" x:Name="UniversalMediaPlayerBar_RelativePosition" BackgroundColor="{DynamicResource UniversalMediaPlayerThumbColor}" VerticalOptions="FillAndExpand" HorizontalOptions="Start" Margin="0, 0, 0, 0" WidthRequest="{DynamicResource UniversalMediaPlayerBar_RelativeSliderPosition}" />
+                    <Grid Grid.Row="1">
+                    
                     <Grid.ColumnDefinitions>
 
                         <ColumnDefinition Width="*" />
@@ -434,7 +444,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" ZIndex="2" VerticalOptions="Start"  HorizontalOptions="FillAndExpand">
                         <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OpenCurrentlyPlayingScreen" NumberOfTapsRequired="1"  />
+                            <SwipeGestureRecognizer Swiped="OpenCurrentlyPlayingScreen" Direction="Up" Threshold="25"  />
                            <!--#region  <SwipeGestureRecognizer Direction="Left" Swiped="UniversalMediaPlayerBarSwipeLeft" Threshold="250" />
                             <SwipeGestureRecognizer Direction="Right" Swiped="UniversalMediaPlayerBarSwipeRight" Threshold="250"/>-->
                         </Grid.GestureRecognizers>
@@ -457,10 +467,10 @@
                             </Border>
                         </Grid>
 
-                        <Border Grid.Column="1" Stroke="#00000000" MinimumWidthRequest="0" StrokeThickness="0" StrokeShape="RoundRectangle 0,25, 0, 25" MaximumWidthRequest="350">
-                            <Grid RowDefinitions="*,*" MinimumWidthRequest="0" MaximumWidthRequest="350" >
+                        <Border Grid.Column="1" Stroke="#00000000" MinimumWidthRequest="0" StrokeThickness="0" StrokeShape="RoundRectangle 0,25, 0, 25">
+                            <Grid RowDefinitions="*,*" MinimumWidthRequest="0"  >
                                 <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingName" LineBreakMode="TailTruncation" Grid.Row="0"  VerticalOptions="End" />
-                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingArtists" LineBreakMode="TailTruncation" Grid.Row="1"  VerticalOptions="Start" FontSize="Body" TextColor="DarkGray" />
+                                <Label x:Name="UniversalMediaPlayer_CurrentlyPlayingArtists" LineBreakMode="TailTruncation" Grid.Row="1"  VerticalOptions="Start"  TextColor="DarkGray" />
                             </Grid>
                         </Border>
 
@@ -480,7 +490,9 @@
 
 
                 </Grid>
-
+ 
+                </Grid>
+                
                 <!--<Label Text="Hola" HorizontalOptions="Center"/> -->
                 <!--<Label x:Name="SliderPosition" Text=""/> -->
 
