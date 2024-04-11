@@ -21,7 +21,7 @@ namespace RudymentaryMobile
 {
     public partial class MainPage : ContentPage
     {
-        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONID"); // actual api/application id omitted
+        DiscordRpcClient client = new DiscordRpcClient("DISCORDAPIAPPLICATIONIDHERE"); // actual api/application id omitted
 
         int count = 0;
         string[] supportedAudioCodecs = { ".mp3", ".flac" };
@@ -42,7 +42,7 @@ namespace RudymentaryMobile
         bool UniversalMediaPlayer_ShuffleFlag = false;
         bool UniversalMediaSlider_IsBeingDragged = false;
         Dictionary<string, bool> toggleablePreferences = new Dictionary<string, bool>();
-
+        double relativeSliderViewWidth = DeviceDisplay.MainDisplayInfo.Width;
         List<string> translatableLanguages = new List<string> { "Original", "Bulgarian", "Czech", "Danish", "German", "Greek", "English", "English (British)", "English (American)", "Spanish", "Estonian", "Finnish", "French", "Hungarian", "Indonesian", "Italian", "Japanese", "Korean", "Lithuanian", "Latvian", "Norwegian", "Dutch", "Polish", "Portuguese", "Portuguese (Brazilian)", "Romanian", "Russian", "Slovak", "Slovenian", "Swedish", "Turkish", "Ukrainian", "Chinese (simplified)" };
         public MainPage()
         {
@@ -80,6 +80,7 @@ namespace RudymentaryMobile
             SettingsGetImageReferenceTest();
             BindableLayout.SetItemsSource(HomeAlbumsCollection, allSavedAlbumData);
             HomePlaylistsCollection.ItemsSource = allSavedPlaylistData;
+            //UniversalMediaPlayerBar_RelativePosition.SetBinding(Grid.WidthRequestProperty, new Binding(relativeSliderViewWidth);
             //UniversalMediaPlayStopButtonCurrentlyPlayingVer.SetBinding(Microsoft.Maui.Controls.Button.TextProperty, new Binding(nameof(UniversalMediaPlayStopButton.Text)));
             
             //LinearGradientBrush homeBackground = new LinearGradientBrush { GradientStops = { }}
@@ -955,6 +956,7 @@ namespace RudymentaryMobile
                     //image.Source =ImageSource.FromUri(new Uri(largeImagePath));
                     //SliderPosition.Text = UniversalMediaSlider.Value.ToString() + "\n" + UniversalMediaElementPlayer.Position.TotalSeconds.ToString() + "\n" + UniversalMediaElementPlayer.Duration.TotalSeconds.ToString();
                     //client.
+                    Resources["UniversalMediaPlayerBar_RelativeSliderPosition"] = UniversalMediaSlider.Value * this.Width;
                     client.SetPresence(new RichPresence()
                     {
                         State = timerString,
@@ -1462,14 +1464,14 @@ namespace RudymentaryMobile
 
         }
 
-        private void OpenCurrentlyPlayingScreen(object sender, TappedEventArgs e)
+        private void OpenCurrentlyPlayingScreen(object sender, SwipedEventArgs e)
         {
             PageCurrentlyPlaying.IsVisible = true;
             //int a = PageCurrentlyPlaying.TranslationX;
             double windowHeight = DeviceDisplay.MainDisplayInfo.Height;
 
-            Animation slideFromBottom = new Animation(v => PageCurrentlyPlaying.TranslationY = v, windowHeight, 0, Easing.CubicInOut);
-            slideFromBottom.Commit(this, "currentlyPlayingBottom", 16, 300);
+            Animation slideFromBottom = new Animation(v => PageCurrentlyPlaying.TranslationY = v, this.Height, 0, Easing.CubicInOut);
+            slideFromBottom.Commit(this, "currentlyPlayingBottom", 8, 500);
         }
         
 
@@ -1478,7 +1480,7 @@ namespace RudymentaryMobile
             //PageCurrentlyPlaying.IsVisible = false;
             double windowHeight = DeviceDisplay.MainDisplayInfo.Height;
 
-            Animation slideFromScreen = new Animation(v => PageCurrentlyPlaying.TranslationY = v, 0, windowHeight, Easing.CubicInOut);
+            Animation slideFromScreen = new Animation(v => PageCurrentlyPlaying.TranslationY = v, 0, this.Height, Easing.CubicInOut);
             slideFromScreen.Commit(this, "currentlyPlayingExit", 16, 300, finished: (val, canceled) =>
             {
                 if (!canceled) { PageCurrentlyPlaying.IsVisible = false; }
