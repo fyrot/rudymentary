@@ -14,6 +14,7 @@ using System.Text;
 //using Microsoft.Maui.Graphics.Win2D;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Windows.Input;
 
 //using Android
 
@@ -43,6 +44,10 @@ namespace RudymentaryMobile
         bool UniversalMediaSlider_IsBeingDragged = false;
         Dictionary<string, bool> toggleablePreferences = new Dictionary<string, bool>();
         double relativeSliderViewWidth = DeviceDisplay.MainDisplayInfo.Width;
+        ObservableCollection<SongData> albumDataItemsSourceObservable = new ObservableCollection<SongData>();
+        List<SongData> albumDataItemsSourceTotal = new List<SongData>();
+        int albumDataItemsTakeVal = 15;
+        Frame addToPlaylistContentFrame;
         List<string> translatableLanguages = new List<string> { "Original", "Bulgarian", "Czech", "Danish", "German", "Greek", "English", "English (British)", "English (American)", "Spanish", "Estonian", "Finnish", "French", "Hungarian", "Indonesian", "Italian", "Japanese", "Korean", "Lithuanian", "Latvian", "Norwegian", "Dutch", "Polish", "Portuguese", "Portuguese (Brazilian)", "Romanian", "Russian", "Slovak", "Slovenian", "Swedish", "Turkish", "Ukrainian", "Chinese (simplified)" };
         public MainPage()
         {
@@ -80,9 +85,22 @@ namespace RudymentaryMobile
             SettingsGetImageReferenceTest();
             BindableLayout.SetItemsSource(HomeAlbumsCollection, allSavedAlbumData);
             HomePlaylistsCollection.ItemsSource = allSavedPlaylistData;
+            AlbumPageSongCollection.ItemsSource = albumDataItemsSourceObservable;
+            
             //UniversalMediaPlayerBar_RelativePosition.SetBinding(Grid.WidthRequestProperty, new Binding(relativeSliderViewWidth);
             //UniversalMediaPlayStopButtonCurrentlyPlayingVer.SetBinding(Microsoft.Maui.Controls.Button.TextProperty, new Binding(nameof(UniversalMediaPlayStopButton.Text)));
-            
+            /*ICommand load5 = new Command(async () =>
+            {
+                if (albumDataItemsSourceObservable.Count != albumDataItemsSourceTotal.Count)
+                {
+                    for (int i = albumDataItemsSourceObservable.Count; i < Math.Min(albumDataItemsSourceObservable.Count + 5, albumDataItemsSourceTotal.Count); i++)
+                    {
+                        albumDataItemsSourceObservable.Add(albumDataItemsSourceTotal[i]);
+                    }
+                    OnPropertyChanged(nameof(albumDataItemsSourceObservable));
+                }
+            }); */
+            //AlbumPageSongCollection.RemainingItemsThresholdReachedCommand = load5;
             //LinearGradientBrush homeBackground = new LinearGradientBrush { GradientStops = { }}
             //UniversalMediaElementPlayer_NewSongSelected(new SongData { AlbumName="GT7"})
         }
@@ -161,50 +179,71 @@ namespace RudymentaryMobile
             PageAddToPlaylist.IsVisible = false;
             PageSettings.IsVisible = false;
         }
-        private void AlbumPageButton_Clicked(object sender, EventArgs e)
+        private async void AlbumPageButton_Clicked(object sender, EventArgs e)
         {
             //await DisplayAlert("Clicked", "You clicked an album", "I know");
             var button = (Border)sender;
             var item = (AlbumData)button.BindingContext;
             //Define AlbumPageAlbumData View and put binding context, can access it later through x.parent.parent.bindingcontext
-            AlbumPageAlbumDataView.BindingContext = item;
-            BindableLayout.SetItemsSource(AlbumPageSongCollection, item.Songs);
+            
             //AlbumPageSongCollection.ItemsSource = item.Songs;
             // Collection view in code
 
             if (item.IsPlaylist == true)
             {
-                BindableLayout.SetItemTemplate(AlbumPageSongCollection, (DataTemplate)this.Resources["PlaylistSongDataTemplate"]);
-                //AlbumPageSongCollection.ItemTemplate = (DataTemplate)this.Resources["PlaylistSongDataTemplate"];
+                //BindableLayout.SetItemTemplate(AlbumPageSongCollection, (DataTemplate)this.Resources["PlaylistSongDataTemplate"]);
+                AlbumPageSongCollection.ItemTemplate = (DataTemplate)this.Resources["PlaylistSongDataTemplate"];
             }
             else if (item.MultiDisc == true)
             {
-                BindableLayout.SetItemTemplate(AlbumPageSongCollection, (DataTemplate)this.Resources["SongDataTemplateMultiDisc"]);
+                //BindableLayout.SetItemTemplate(AlbumPageSongCollection, (DataTemplate)this.Resources["SongDataTemplateMultiDisc"]);
+                AlbumPageSongCollection.ItemTemplate = (DataTemplate)this.Resources["SongDataTemplateMultiDisc"];
             }
             else
             {
-                BindableLayout.SetItemTemplate(AlbumPageSongCollection, (DataTemplate)this.Resources["SongDataTemplate"]);
-                //AlbumPageSongCollection.ItemTemplate = (DataTemplate)this.Resources["SongDataTemplate"];
+                //BindableLayout.SetItemTemplate(AlbumPageSongCollection, (DataTemplate)this.Resources["SongDataTemplate"]);
+                AlbumPageSongCollection.ItemTemplate = (DataTemplate)this.Resources["SongDataTemplate"];
             }
             //
+            AlbumPageAlbumDataView.BindingContext = item;
+            albumDataItemsTakeVal = 15;
+            //AlbumPageSongCollection.ItemsSource = item.Songs.Take(albumDataItemsTakeVal);
+            //albumDataItemsSourceObservable.Add(item.Songs.Take(albumDataItemsTakeVal));
+            if (item.Songs != albumDataItemsSourceTotal) { albumDataItemsSourceObservable.Clear(); }
+            if (albumDataItemsSourceObservable.Count == 0) { foreach (SongData s in item.Songs.Take(albumDataItemsTakeVal)) { albumDataItemsSourceObservable.Add(s); } }
+            albumDataItemsSourceTotal = item.Songs;
             PageAlbum.BindingContext = item;
             PageHome.IsVisible = false;
             PageSearch.IsVisible = false;
             PageAlbum.IsVisible = true;
+            //await LazyLoadAlbumSongs.LoadViewAsync();
             PageCreatePlaylist.IsVisible = false;
             PageSettings.IsVisible = false;
             GC.Collect();
             GC.WaitForPendingFinalizers();
             AlbumPageOpenedAnimationCompilation();
+            //await FillAsynchronously();
+            //FillAsynchronously();
         }
 
+        private async void FillAsynchronously()
+        {
+            await Task.Delay(9000);
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                for (int i = albumDataItemsTakeVal; i < albumDataItemsSourceTotal.Count; i++)
+                {
+                    albumDataItemsSourceObservable.Add(albumDataItemsSourceTotal[i]);
+                }
+            });
+        }
 
         private async void AlbumPageSongItem_Tapped(object sender, EventArgs e)
         {
             var button = (Frame)sender;
             var item = (SongData)button.BindingContext;
 
-            songDataQueue = (List<SongData>)BindableLayout.GetItemsSource(AlbumPageSongCollection); //(List<SongData>)AlbumPageSongCollection.ItemsSource;
+            songDataQueue = albumDataItemsSourceTotal; //(List<SongData>)AlbumPageSongCollection.ItemsSource; //(List<SongData>)BindableLayout.GetItemsSource(AlbumPageSongCollection);
             songDataQueueIndex = songDataQueue.IndexOf(item);
             var overallAlbum = (AlbumData)PageAlbum.BindingContext;
             //var currentArtPngPath = Path.Combine(FileSystem.Current.AppDataDirectory, "currentart.png");
@@ -218,6 +257,7 @@ namespace RudymentaryMobile
             }
 
             UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[item.ImageKey];
+            //UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Source = allImageReferences[item.ImageKey];
             UniversalMediaElementPlayer_NewSongSelected(item);
             currentAlbumPlayed = overallAlbum.AlbumName;
             //await DisplayAlert("Lyrics", item.Lyrics, "Alright");
@@ -823,6 +863,14 @@ namespace RudymentaryMobile
                 client.ClearPresence();
 
                 UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[givenSongData.ImageKey];
+                //UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.FadeTo(0, 250);
+                UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Source = allImageReferences[givenSongData.ImageKey];
+                // animate in the switch so it's less abrupt/apparent since it's displayed much larger
+                Animation slideInFromRight = new Animation(v => UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.TranslationX = v, 75, 0, Easing.CubicInOut);
+                Animation fadeInFromSwitch = new Animation(v => UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Opacity = v, 0, 1, Easing.CubicInOut);
+                slideInFromRight.Commit(this, "currentlyPlayingImageSlideFromRight");
+                fadeInFromSwitch.Commit(this, "currentlyPlayingImageFadeFromSwitch");
+                //
                 UniversalMediaPlayer_CurrentlyPlayingName.Text = givenSongData.SongName;
                 UniversalMediaPlayer_CurrentlyPlayingArtists.Text = givenSongData.ArtistName;
                 ToolTipProperties.SetText(UniversalMediaPlayer_CurrentlyPlayingName, givenSongData.SongName);
@@ -857,7 +905,7 @@ namespace RudymentaryMobile
                     LyricsLoadLabel(givenSongData.Lyrics["Original"]);
                     Picker translateToLabel = new Picker { ItemsSource = new List<string> { "Translate to..", "Transliterate to.." }, SelectedIndex = 0, TextColor = Color.Parse("White") };
                     Picker translateToLanguagePicker = new Picker { ItemsSource = translatableLanguages, SelectedIndex = 0, TextColor = Color.Parse("White") };
-                    Microsoft.Maui.Controls.Button translateButton = new Microsoft.Maui.Controls.Button { Text = "🗪", BackgroundColor = Color.Parse("Transparent"), TextColor = Color.Parse("White") };
+                    Microsoft.Maui.Controls.Button translateButton = new Microsoft.Maui.Controls.Button { Text = "🗪", BackgroundColor = Color.Parse("Transparent"), TextColor = Color.Parse("White"), FontFamily="NotoSansSymbols2" };
                     translateToLanguagePicker.SelectedIndexChanged += new EventHandler(LyricsTranslatePickerSelection_Changed);
                     translateToLabel.SelectedIndexChanged += new EventHandler(LyricsTranslatePickerSelection_Changed);
                     translateButton.Clicked += new EventHandler(LyricsTranslateButton_Clicked);
@@ -1111,8 +1159,8 @@ namespace RudymentaryMobile
             albumData.Songs = newSongs;
             allSavedPlaylistData[playlistIndex] = albumData;
             AddToPlaylist_SaveToFile();
-            //AlbumPageSongCollection.ItemsSource = newSongs.ToObservableCollection();
-            BindableLayout.SetItemsSource(AlbumPageSongCollection, newSongs.ToObservableCollection());
+            AlbumPageSongCollection.ItemsSource = newSongs.ToObservableCollection();
+            //BindableLayout.SetItemsSource(AlbumPageSongCollection, newSongs.ToObservableCollection());
             await DisplayAlert("Woah", albumData.AlbumName, "Alright");
 
         }
@@ -1346,6 +1394,7 @@ namespace RudymentaryMobile
             songDataQueue = new List<SongData> { item };
             songDataQueueIndex = 0;
             UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[item.ImageKey];
+            //UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Source = allImageReferences[item.ImageKey];
             currentAlbumPlayed = item.AlbumName;
             UniversalMediaElementPlayer_NewSongSelected(item);
         }
@@ -1435,11 +1484,21 @@ namespace RudymentaryMobile
             Animation songFromRight = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.TranslationX = v, 25, 0, Easing.CubicIn);
             Animation artistNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.Opacity = v, 0, 1, Easing.CubicIn);
             Animation artistFromRight = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.TranslationX = v, 25, 0, Easing.CubicIn);
+            // currently playing screen bound labels
+            Animation songNameFadeCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingNameScreenVer.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation songFromRightCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingNameScreenVer.TranslationX = v, 25, 0, Easing.CubicIn);
+            Animation artistNameFadeCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtistsScreenVer.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation artistFromRightCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtistsScreenVer.TranslationX = v, 25, 0, Easing.CubicIn);
             //imageFadeFromLeft.Commit(this, "albumImageSkipFade", 16, 1000);
             songNameFade.Commit(this, "songNameSkipFade", 16, 500);
             artistNameFade.Commit(this, "artistNameSkipFade", 16, 500);
             songFromRight.Commit(this, "songNameFromRight", 16, 500);
             artistFromRight.Commit(this, "artistNameFromRight", 16, 500);
+            // currently playing animation commits
+            songNameFadeCurrentlyPlaying.Commit(this, "songNameSkipFadeCurrentlyPlaying", 16, 500);
+            artistNameFadeCurrentlyPlaying.Commit(this, "artistNameSkipFadeCurrentlyPlaying", 16, 500);
+            songFromRightCurrentlyPlaying.Commit(this, "songNameFromRightCurrentlyPlaying", 16, 500);
+            artistFromRightCurrentlyPlaying.Commit(this, "artistNameFromRightCurrentlyPlaying", 16, 500);
 
         }
         private void SongBackAnimationCompilation()
@@ -1448,12 +1507,21 @@ namespace RudymentaryMobile
             Animation songFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingName.TranslationX = v, -25, 0, Easing.CubicIn);
             Animation artistNameFade = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.Opacity = v, 0, 1, Easing.CubicIn);
             Animation artistFromLeft = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtists.TranslationX = v, -25, 0, Easing.CubicIn);
+            // currently playing screen bound labels
+            Animation songNameFadeCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingNameScreenVer.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation songFromLeftCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingNameScreenVer.TranslationX = v, -25, 0, Easing.CubicIn);
+            Animation artistNameFadeCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtistsScreenVer.Opacity = v, 0, 1, Easing.CubicIn);
+            Animation artistFromLeftCurrentlyPlaying = new Animation(v => UniversalMediaPlayer_CurrentlyPlayingArtistsScreenVer.TranslationX = v, -25, 0, Easing.CubicIn);
+            //
             songNameFade.Commit(this, "songNameSkipFade", 16, 500);
             artistNameFade.Commit(this, "artistNameSkipFade", 16, 500);
-            songFromLeft.Commit(this, "songNameFromRight", 16, 500);
-            artistFromLeft.Commit(this, "artistNameFromRight", 16, 500);
-
-
+            songFromLeft.Commit(this, "songNameFromLeft", 16, 500);
+            artistFromLeft.Commit(this, "artistNameFromLeft", 16, 500);
+            // currently  playing animation commits
+            songNameFadeCurrentlyPlaying.Commit(this, "songNameSkipFadeCurrentlyPlaying", 16, 500);
+            artistNameFadeCurrentlyPlaying.Commit(this, "artistNameSkipFadeCurrentlyPlaying", 16, 500);
+            songFromLeftCurrentlyPlaying.Commit(this, "songNameFromLeftCurrentlyPlaying", 16, 500);
+            artistFromLeftCurrentlyPlaying.Commit(this, "artistNameFromLeftCurrentlyPlaying", 16, 500);
         }
         private void AlbumPageOpenedAnimationCompilation()
         {
@@ -1496,6 +1564,62 @@ namespace RudymentaryMobile
         private void UniversalMediaPlayerBarSwipeRight(object sender, SwipedEventArgs e)
         {
             UniversalMediaPreviousTrackButton_Clicked(new object(), new EventArgs());
+        }
+
+        private async void PageAlbum_Scrolled(object sender, ScrolledEventArgs e)
+        {
+            if (albumDataItemsSourceObservable.Count == albumDataItemsSourceTotal.Count) { return; }
+            ScrollView scrollView = (ScrollView)sender;
+            double scrollingSpace = scrollView.ContentSize.Height - scrollView.Height;
+
+            if (scrollingSpace - e.ScrollY < 100 )
+            {
+                //await DisplayAlert("Okay", "Uh", "Fatty");
+                if (albumDataItemsSourceObservable.Count != albumDataItemsSourceTotal.Count)
+                {
+                    for (int i = albumDataItemsSourceObservable.Count; i < Math.Min(albumDataItemsTakeVal+10, albumDataItemsSourceTotal.Count); i++)
+                    {
+                        albumDataItemsSourceObservable.Add(albumDataItemsSourceTotal[i]);
+                    }
+                    //OnPropertyChanged(nameof(albumDataItemsSourceObservable));
+                }
+                albumDataItemsTakeVal += 10;
+            } else
+            {
+                // do nothing
+            }
+            
+        }
+
+        private async void DragGestureRecognizer_DragStarting(object sender, DragStartingEventArgs e)
+        {
+            DragGestureRecognizer sendingObj = (DragGestureRecognizer)sender;
+            addToPlaylistContentFrame = (Frame)sendingObj.Parent;
+            //await DisplayAlert("Type", sendingObj.Parent.GetType().ToString(), "Okay");
+
+        }
+
+        private async void DropGestureRecognizer_Drop(object sender, DropEventArgs e)
+        {
+            //var droppedSong = e.Data;
+            addToPlaylistToBeAdded = (SongData)addToPlaylistContentFrame.BindingContext;
+            await DisplayAlert("Dropped item", addToPlaylistToBeAdded.SongName, "Muchas gracias");
+            AlbumData currentAlbumData = (AlbumData)AlbumPageAlbumDataView.BindingContext;
+            if (currentAlbumData.IsPlaylist == false)
+            {
+                PageAddToPlaylist.IsVisible = true;
+                List<AddToPlaylistCustomClass> sourceList = new List<AddToPlaylistCustomClass>();
+                int i = 0;
+                foreach (AlbumData playlist in allSavedPlaylistData)
+                {
+                    sourceList.Add(new AddToPlaylistCustomClass { PlaylistName = playlist.AlbumName, PlaylistIndex = i });
+                    i++;
+                }
+                AddToPlaylistSelectCollection.ItemsSource = sourceList;
+            } else
+            {
+
+            }
         }
     }
 }
