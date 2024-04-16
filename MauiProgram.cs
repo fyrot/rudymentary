@@ -2,7 +2,7 @@ using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
 
-namespace RudymentaryNet8
+namespace RudymentaryMobile
 {
     public static class MauiProgram
     {
@@ -17,6 +17,8 @@ namespace RudymentaryNet8
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("JetBrainsMono-Bold.ttf", "JetBrainsIconFont");
+                    fonts.AddFont("NotoSansSymbols2-Regular.ttf", "NotoSansSymbols2");
                 });
 
 #if DEBUG
