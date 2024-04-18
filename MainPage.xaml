@@ -287,11 +287,11 @@
                 <VerticalStackLayout Spacing="20">
                     <Button Text="Cancel" Clicked="HomePageButton_Clicked" />
                     <Label Text="Adding to playlist.." />
-                    <ListView x:Name="AddToPlaylistSelectCollection">
-                        <ListView.ItemTemplate>
+                    <CollectionView x:Name="AddToPlaylistSelectCollection">
+                        <CollectionView.ItemTemplate>
 
                             <DataTemplate>
-                                <ViewCell>
+                          
 
 
                                     <Frame>
@@ -300,10 +300,10 @@
                                         </Frame.GestureRecognizers>
                                         <Label Text="{Binding PlaylistName}" />
                                     </Frame>
-                                </ViewCell>
+                                
                             </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </VerticalStackLayout>
 
             </ScrollView>
