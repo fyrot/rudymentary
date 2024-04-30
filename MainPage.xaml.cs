@@ -86,6 +86,8 @@ namespace RudymentaryMobile
             BindableLayout.SetItemsSource(HomeAlbumsCollection, allSavedAlbumData);
             HomePlaylistsCollection.ItemsSource = allSavedPlaylistData;
             AlbumPageSongCollection.ItemsSource = albumDataItemsSourceObservable;
+            Resources["SongDataTemplateWidthValue"] = DeviceDisplay.Current.MainDisplayInfo.Width - 180;
+            relativeSliderViewWidth = this.Width;
             
             //UniversalMediaPlayerBar_RelativePosition.SetBinding(Grid.WidthRequestProperty, new Binding(relativeSliderViewWidth);
             //UniversalMediaPlayStopButtonCurrentlyPlayingVer.SetBinding(Microsoft.Maui.Controls.Button.TextProperty, new Binding(nameof(UniversalMediaPlayStopButton.Text)));
@@ -864,12 +866,17 @@ namespace RudymentaryMobile
 
                 UniversalMediaPlayer_AlbumArtImage.Source = allImageReferences[givenSongData.ImageKey];
                 //UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.FadeTo(0, 250);
+                if (UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Source != allImageReferences[givenSongData.ImageKey])
+                {
+                    //Animation fadeInFromNothing = new Animation(v => CurrentlyPlayingPage_ContentViewGrid.Opacity = v, 0, 1, Easing.CubicInOut);
+                    //fadeInFromNothing.Commit(this, "currentlyPlayingAlbumArtAnimationChanged", 1000);
+                }
                 UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Source = allImageReferences[givenSongData.ImageKey];
                 // animate in the switch so it's less abrupt/apparent since it's displayed much larger
-                Animation slideInFromRight = new Animation(v => UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.TranslationX = v, 75, 0, Easing.CubicInOut);
-                Animation fadeInFromSwitch = new Animation(v => UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Opacity = v, 0, 1, Easing.CubicInOut);
-                slideInFromRight.Commit(this, "currentlyPlayingImageSlideFromRight");
-                fadeInFromSwitch.Commit(this, "currentlyPlayingImageFadeFromSwitch");
+                //Animation slideInFromRight = new Animation(v => UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.TranslationX = v, 75, 0, Easing.CubicInOut);
+                //Animation fadeInFromSwitch = new Animation(v => UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Opacity = v, 0, 1, Easing.CubicInOut);
+                //slideInFromRight.Commit(this, "currentlyPlayingImageSlideFromRight");
+                //fadeInFromSwitch.Commit(this, "currentlyPlayingImageFadeFromSwitch");
                 //
                 UniversalMediaPlayer_CurrentlyPlayingName.Text = givenSongData.SongName;
                 UniversalMediaPlayer_CurrentlyPlayingArtists.Text = givenSongData.ArtistName;
@@ -889,7 +896,17 @@ namespace RudymentaryMobile
                     Animation barSizeGrowthRowDefinition = new Animation(v => UniversalMediaPlayerBarRowDefinition.Height = v, 0, 100);
                     barSizeGrowth.Commit(this, "PlayerBarGrowth", 16, 1000, Easing.CubicOut);
                     barSizeGrowthRowDefinition.Commit(this, "PlayerBarGrowthRowDefinition", 16, 1000, Easing.CubicOut);
-
+                    /*UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.WidthRequest = UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Width;
+                    UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.HeightRequest = UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.Height;
+                    UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying.HorizontalOptions = LayoutOptions.Start;
+                    UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder.VerticalOptions = LayoutOptions.Start;
+                    
+                    UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder.WidthRequest = UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder.Width;
+                    UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder.HeightRequest = UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder.Height;
+                    UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder.HorizontalOptions = LayoutOptions.Start;
+                    UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder.VerticalOptions = LayoutOptions.Start; */
+                    
+                    
                     //UniversalMediaPlayerBarRowDefinition.Height = 100; 
                     //UniversalMediaPlayerBar.HeightRequest = 100; 
                     //UniversalMediaPlayerBar.IsVisible = true; 
@@ -1105,6 +1122,9 @@ namespace RudymentaryMobile
                 PageAddToPlaylist.IsVisible = false;
                 PageSettings.IsVisible = false;
                 UniversalMediaShowLyricsButton.Opacity = 1;
+                //TappedEventArgs exTappedEvent = (TappedEventArgs)new object();
+                //CloseCurrentlyPlayingScreen(new object(), exTappedEvent);
+
             }
 
 
@@ -1117,7 +1137,7 @@ namespace RudymentaryMobile
 
             var songDataVar = (SongData)menuFlyout.Parent.Parent.BindingContext;
             addToPlaylistToBeAdded = songDataVar;
-            await DisplayAlert("Okay", addToPlaylistToBeAdded.SongName, "Alright");
+            //await DisplayAlert("Okay", addToPlaylistToBeAdded.SongName, "Alright");
             PageAddToPlaylist.IsVisible = true;
             List<AddToPlaylistCustomClass> sourceList = new List<AddToPlaylistCustomClass>();
             int i = 0;
@@ -1325,7 +1345,7 @@ namespace RudymentaryMobile
             string convertedLyrics;
             if (translateOrTransliterate.SelectedIndex == 0)
             {
-                var translator = new MicrosoftTranslator();
+                var translator = new GoogleTranslator();
                 var results = await translator.TranslateAsync(currentSongCopy.Lyrics["Original"], Language.GetLanguage(translatableLanguages[languagePicked.SelectedIndex]));
 
                 convertedLyrics = results.Translation;
@@ -1574,9 +1594,12 @@ namespace RudymentaryMobile
 
             if (scrollingSpace - e.ScrollY < 100 )
             {
-                //await DisplayAlert("Okay", "Uh", "Fatty");
+
                 if (albumDataItemsSourceObservable.Count != albumDataItemsSourceTotal.Count)
                 {
+
+                    //albumDataItemsSourceObservable = albumDataItemsSourceTotal.ToObservableCollection();
+                    
                     for (int i = albumDataItemsSourceObservable.Count; i < Math.Min(albumDataItemsTakeVal+10, albumDataItemsSourceTotal.Count); i++)
                     {
                         albumDataItemsSourceObservable.Add(albumDataItemsSourceTotal[i]);
@@ -1593,33 +1616,50 @@ namespace RudymentaryMobile
 
         private async void DragGestureRecognizer_DragStarting(object sender, DragStartingEventArgs e)
         {
-            DragGestureRecognizer sendingObj = (DragGestureRecognizer)sender;
-            addToPlaylistContentFrame = (Frame)sendingObj.Parent;
+            try
+            {
+                DragGestureRecognizer sendingObj = (DragGestureRecognizer)sender;
+                addToPlaylistContentFrame = (Frame)sendingObj.Parent;
+            } catch (Exception ex)
+            {
+                await DisplayAlert("Error found drag", ex.Message, "Okay");
+            }
+            
             //await DisplayAlert("Type", sendingObj.Parent.GetType().ToString(), "Okay");
 
         }
 
         private async void DropGestureRecognizer_Drop(object sender, DropEventArgs e)
         {
+            try
+            {
             //var droppedSong = e.Data;
-            addToPlaylistToBeAdded = (SongData)addToPlaylistContentFrame.BindingContext;
-            await DisplayAlert("Dropped item", addToPlaylistToBeAdded.SongName, "Muchas gracias");
-            AlbumData currentAlbumData = (AlbumData)AlbumPageAlbumDataView.BindingContext;
-            if (currentAlbumData.IsPlaylist == false)
-            {
-                PageAddToPlaylist.IsVisible = true;
-                List<AddToPlaylistCustomClass> sourceList = new List<AddToPlaylistCustomClass>();
-                int i = 0;
-                foreach (AlbumData playlist in allSavedPlaylistData)
+                addToPlaylistToBeAdded = (SongData)addToPlaylistContentFrame.BindingContext;
+                await DisplayAlert("Dropped item", addToPlaylistToBeAdded.SongName, "Muchas gracias");
+                AlbumData currentAlbumData = (AlbumData)AlbumPageAlbumDataView.BindingContext;
+                if (currentAlbumData.IsPlaylist == false)
                 {
-                    sourceList.Add(new AddToPlaylistCustomClass { PlaylistName = playlist.AlbumName, PlaylistIndex = i });
-                    i++;
-                }
-                AddToPlaylistSelectCollection.ItemsSource = sourceList;
-            } else
-            {
+                    
+                    List<AddToPlaylistCustomClass> sourceList = new List<AddToPlaylistCustomClass>();
+                    int i = 0;
+                    foreach (AlbumData playlist in allSavedPlaylistData)
+                    {
+                        sourceList.Add(new AddToPlaylistCustomClass { PlaylistName = playlist.AlbumName, PlaylistIndex = i });
+                        i++;
+                    }
+                    AddToPlaylistSelectCollection.ItemsSource = sourceList;
+                    PageAddToPlaylist.IsVisible = true;
+                } else
+                {
 
+                }
+            } catch (Exception ex)
+            {
+                await DisplayAlert("Error encountered", ex.Message, "Okay");
             }
+            
         }
+
+        
     }
 }
