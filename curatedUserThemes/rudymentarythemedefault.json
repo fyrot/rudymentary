@@ -1,0 +1,12 @@
+{
+  "UniversalMediaPlayerThumbColor": "#FFA500",
+  "UniversalMediaPlayerIconTextColor": "#000000",
+  "UniversalMediaPlayerIconBackgroundColor": "#FFFFFF",
+  "UniversalMediaPlayerBackgroundColor": "#181818",
+  "UniversalMediaPlayerAlbumArtBackgroundColor": "#181818",
+  "NavigationIconBarBackgroundColor": "#000000",
+  "HomePageBackgroundColor": "#1F1F1F",
+  "AlbumPageBackgroundColor": "#1F1F1F",
+  "SettingsPageBackgroundColor": "#1F1F1F",
+  "ShellBackgroundColor": "#333333"
+}
