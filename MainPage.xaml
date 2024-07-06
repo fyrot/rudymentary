@@ -127,7 +127,10 @@
             <ScrollView x:Name="PageHome" BackgroundColor="{DynamicResource HomePageBackgroundColor}" Grid.Row="0" IsVisible="True">
                 <VerticalStackLayout Padding="20" Spacing="20">
                     <!--<Label Text="Home" HorizontalOptions="Center" VerticalOptions="Center"/> -->
-                    <Label Text="-Albums-" TextColor="White" FontAttributes="Bold" />
+
+                    <!--<Button x:Name="TestButton01" Text="Check" Clicked="SettingsGetAlbumsToSongs" /> -->
+                    <!--<Button x:Name="TestButton02" Text="Get info" Clicked="SettingsGetAlbumDataInfo" /> -->
+                    <Label Text="-Albums-" TextColor="White" FontFamily="RobotoBold" />
 
                     <FlexLayout x:Name="HomeAlbumsCollection" 
                                 AlignContent="Start"
@@ -139,7 +142,7 @@
 
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Border WidthRequest="150" HeightRequest="180" Margin="5" ToolTipProperties.Text="{Binding AlbumName}"
+                                <Border WidthRequest="{DynamicResource AlbumTileWidthScalar}" HeightRequest="{DynamicResource AlbumTileHeightScalar}" Margin="5" ToolTipProperties.Text="{Binding AlbumName}"
                                         Stroke="#000000"
                                         StrokeThickness="1"
                                         BackgroundColor="#0F0F0F"
@@ -150,11 +153,9 @@
                                     </Border.GestureRecognizers>
 
                                     <VerticalStackLayout>
-                                        <Image WidthRequest="150" HeightRequest="150" ZIndex="1" BackgroundColor="#181818" Source="{Binding AlbumArt}" Loaded="Image_Loaded"/>
+                                        <Image WidthRequest="{DynamicResource AlbumTileWidthScalar}" HeightRequest="{DynamicResource AlbumTileWidthScalar}" ZIndex="1" BackgroundColor="#181818" Source="{Binding AlbumArt}" Aspect="Fill" Loaded="Image_Loaded"/>
                                         <Grid RowDefinitions="*,*,*">
-                                            <Label Text="{Binding AlbumName}" Grid.Row="1" ZIndex="5" Padding="10, 3, 10, 0" LineBreakMode="TailTruncation" HorizontalTextAlignment="Center" FontAutoScalingEnabled="True" VerticalTextAlignment="Center">
-
-                                            </Label>
+                                            <Label Text="{Binding AlbumName}" TextColor="White" Grid.Row="1" ZIndex="5" Padding="{DynamicResource AlbumTilePaddingScalar}" FontSize="{DynamicResource AlbumTileTitleScalar}" MaxLines="1" LineBreakMode="TailTruncation" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                                         </Grid>
 
                                     </VerticalStackLayout>
@@ -163,15 +164,19 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </FlexLayout>
-                    <Label Text="-Playlists-" TextColor="White" />
+                    <Label Text="-Playlists-" TextColor="White" FontFamily="RobotoBold">
+                    </Label>
                     <HorizontalStackLayout Spacing="20">
-                        <CollectionView x:Name="HomePlaylistsCollection" VerticalOptions="Start">
+                        <CollectionView
+                        x:Name="HomePlaylistsCollection" VerticalOptions="Start"
+                                    
+                                    >
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Border WidthRequest="150" HeightRequest="180" ToolTipProperties.Text="{Binding AlbumName}"
+                                    <Border WidthRequest="{DynamicResource AlbumTileWidthScalar}" HeightRequest="{DynamicResource AlbumTileHeightScalar}" Margin="5" ToolTipProperties.Text="{Binding AlbumName}"
                                             Stroke="#000000"
                                             StrokeThickness="1"
                                             BackgroundColor="#0F0F0F"
@@ -186,7 +191,7 @@
                                         </FlyoutBase.ContextFlyout>
                                         <VerticalStackLayout>
                                             <Image WidthRequest="150" HeightRequest="150" Loaded="Image_Loaded" BackgroundColor="#181818" Source="{Binding AlbumArt}" />
-                                            <Label Text="{Binding AlbumName}" HorizontalTextAlignment="Center" MaxLines="1"  LineBreakMode="TailTruncation" Margin="5, 0, 5, 0" FontAutoScalingEnabled="True" />
+                                            <Label Text="{Binding AlbumName}" HorizontalTextAlignment="Center" MaxLines="1" FontSize="{DynamicResource AlbumTileTitleScalar}"  LineBreakMode="TailTruncation" Margin="5, 0, 5, 0" FontAutoScalingEnabled="True" />
                                         </VerticalStackLayout>
                                     </Border>
                                 </DataTemplate>
@@ -194,14 +199,17 @@
                         </CollectionView>
                         <Frame BackgroundColor="White" WidthRequest="150" HeightRequest="180">
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="CreatePlaylistPageButton_Clicked" />
+                                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="CreatePlaylistButton_Tapped" />
                             </Frame.GestureRecognizers>
                             <VerticalStackLayout>
                                 <Label WidthRequest="100" HeightRequest="100" TextColor="Black" FontSize="24" Text="+"/>
                                 <Label Text="Add a playlist"  TextColor="Black"/>
                             </VerticalStackLayout>
                         </Frame>
+                        
                     </HorizontalStackLayout>
+                        
+                   
 
                 </VerticalStackLayout>
 
@@ -213,7 +221,7 @@
 
 
                             <VerticalStackLayout>
-                                <Button x:Name="AlbumPageExitButton" Text="←" Clicked="HomePageButton_Clicked" BorderWidth="0"  Margin="0, 0, 0, 0"/>
+                                <Button x:Name="AlbumPageExitButton" Text="←" Clicked="HomePageButton_Clicked" FontFamily="NotoSansSymbols2" FontAttributes="Bold" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BorderWidth="0"  Margin="0, 0, 0, 0"/>
                                 <Border BackgroundColor="#141414" Margin="0, 10, 0, 0" StrokeThickness="0" Padding="-1, -1, -1, -1"  StrokeShape="RoundRectangle 25,25,25,25">
 
                                     <Grid RowDefinitions="*, *">
@@ -225,9 +233,9 @@
                                                 </Grid>
 
                                             </Border>
-                                            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Margin="40, 0, 0, 0">
-                                                <Label Text="{Binding AlbumName}" FontAttributes="Bold" CharacterSpacing="1" VerticalTextAlignment="Center"  FontSize="Large"/>
-                                                <Label Text="{Binding AlbumArtists}" VerticalTextAlignment="Center" FontSize="Medium" TextColor="Gray" FontAttributes="Italic" />
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Padding="30" Margin="0, 0, 0, 0">
+                                                <Label Text="{Binding AlbumName}" FontAttributes="Bold" CharacterSpacing="1" MaxLines="3" LineBreakMode="TailTruncation" VerticalTextAlignment="Center"  FontSize="Medium"/>
+                                                <Label Text="{Binding AlbumArtists}" VerticalTextAlignment="Center" FontSize="Small" MaxLines="1" LineBreakMode="TailTruncation" TextColor="Gray" FontAttributes="Italic" />
                                             </VerticalStackLayout>
 
                                         </Grid>
@@ -241,7 +249,7 @@
 
                                                 </CollectionView>
                                             </Grid>
-                                            
+
                                         </Border>
 
                                     </Grid>
@@ -252,12 +260,13 @@
                 </ContentView>
             </ScrollView>
             <ScrollView x:Name="PageSearch" Grid.Row="0" BackgroundColor="{DynamicResource HomePageBackgroundColor}" IsVisible="False">
-                <Grid ColumnDefinitions="50, *, 50">
+                <Grid ColumnDefinitions="Auto, *, Auto">
                     <Grid RowDefinitions="100, 5, *" Grid.Column="1">
-                        <SearchBar TextChanged="SearchSongSearchEntry_TextChanged" Grid.Row="0" Margin="25" Placeholder="Search.." />
+                        
+                        <SearchBar TextChanged="SearchSongSearchEntry_TextChanged" Grid.Row="0" Margin="25" Placeholder="Search.." BackgroundColor="White"  />
                         <CollectionView x:Name="SearchSongSearchResults" Grid.Row="2" IsVisible="False">
                             <CollectionView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
@@ -269,12 +278,12 @@
                                         <Grid ColumnDefinitions="54, 10,*,10,*,10,40,10">
 
 
-                                            <Frame Grid.Column="0" Margin="0, 0, 0, 0" IsClippedToBounds="True" Padding="0"  CornerRadius="15">
-                                                <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" />
-                                            </Frame>
+                                            <Border Grid.Column="0" StrokeShape="RoundRectangle 10, 10, 10, 10" StrokeThickness="0">
+                                                <Image Source="{Binding Path=ImageKey, Converter={StaticResource KeyToImgSource}}" WidthRequest="54" HeightRequest="54" Aspect="Fill" />
+                                            </Border>
 
-                                            <Label Text="{Binding SongName}" Grid.Column="2" Margin="5, 0,0,0" VerticalTextAlignment="Center" />
-                                            <Label Text="{Binding AlbumName}" TextColor="Gray" Grid.Column="4" VerticalTextAlignment="Center"/>
+                                            <Label Text="{Binding SongName}" Grid.Column="2" Margin="5, 0,0,0" FontSize="Caption" MaxLines="2" VerticalTextAlignment="Center" />
+                                            <Label Text="{Binding AlbumName}" TextColor="Gray" Grid.Column="4" FontSize="Caption" MaxLines="2" VerticalTextAlignment="Center"/>
                                             <Label Text="{Binding DurationString}" Grid.Column="6" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                                         </Grid>
 
@@ -302,7 +311,7 @@
                                     <Frame.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="AddToPlaylist_SelectedPlaylist" NumberOfTapsRequired="1" />
                                     </Frame.GestureRecognizers>
-                                    <Label Text="{Binding PlaylistName}" />
+                                    <Label Text="{Binding PlaylistName}" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" />
                                 </Frame>
 
                             </DataTemplate>
@@ -312,13 +321,18 @@
 
             </ScrollView>
             <!-- This is the create playlist page -->
-            <ScrollView x:Name="PageCreatePlaylist" Grid.Row="0" IsVisible="False" BackgroundColor="#3F3F3F">
-                <Grid RowDefinitions="*">
-                    <Grid Grid.Row="0" ColumnDefinitions="*, *, *">
+            <ScrollView x:Name="PageCreatePlaylist" Grid.Row="0" IsVisible="False" BackgroundColor="{DynamicResource HomePageBackgroundColor}"> <!-- used to be #3F3F3F for background color -->
+                <Grid RowDefinitions="Auto ,*">
+                    <Button Grid.Row="0" Text="←" FontAttributes="Bold" Padding="10" FontFamily="NotoSansSymbols2" Margin="20" FontSize="Large" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Pressed="HomePageButton_Clicked" />
+                    <Grid Grid.Row="1" ColumnDefinitions="*, *, *">
                         <VerticalStackLayout Spacing="20" Grid.Column="1" VerticalOptions="Center">
-
-                            <Label Text="Creating Playlist" HorizontalTextAlignment="Center"/>
-                            <Frame BackgroundColor="White" WidthRequest="300" HeightRequest="300" BorderColor="Transparent">
+                            <Grid ColumnDefinitions="Auto, *" VerticalOptions="Center">
+                                <Label Text="Creating " Grid.Column="0" VerticalOptions="Center" />
+                                <Entry Text="" Grid.Column="1" x:Name="CreatePlaylist_PlaylistName" VerticalOptions="Center" BackgroundColor="#1F1F1F" Placeholder="Playlist Name"  IsTextPredictionEnabled="False" IsSpellCheckEnabled="False"/>
+                            </Grid>
+                            
+                            
+                            <!--<Frame BackgroundColor="White" WidthRequest="300" HeightRequest="300" BorderColor="Transparent">
                                 <VerticalStackLayout>
                                     <Label TextColor="Black" FontSize="64" Text="+" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                                     <Label TextColor="Black" FontSize="12" Text="Select a Playlist Cover" HorizontalTextAlignment="Center"/>
@@ -337,12 +351,12 @@
                             <Border Stroke="#000000" StrokeThickness="1" StrokeShape="RoundRectangle 10, 10, 0 ,0" Padding="2,8">
                                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="15">
                                     <Label Text="Playlist Name" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
-                                    <Entry Text="" x:Name="CreatePlaylist_PlaylistName" HorizontalTextAlignment="Center" BackgroundColor="#1F1F1F" Placeholder="Enter Playlist Name Here"  MinimumWidthRequest="100" IsTextPredictionEnabled="False" IsSpellCheckEnabled="False"/>
+                                    
                                 </HorizontalStackLayout>
-                            </Border>
+                            </Border>-->
 
 
-                            <Button Text="Save Playlist" WidthRequest="250" HeightRequest="90"  Clicked="CreatePlaylistSaveButton_Clicked" BorderWidth="0"/>
+                            <Button Text="Save Playlist" Padding="20" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" Clicked="CreatePlaylistSaveButton_Clicked" BorderWidth="0"/>
                         </VerticalStackLayout>
                     </Grid>
 
@@ -350,8 +364,8 @@
 
             </ScrollView>
             <Grid x:Name="PageSongLyrics" ColumnDefinitions="50, *, 50" Grid.Row="0" IsVisible="False" BackgroundColor="{DynamicResource AlbumPageBackgroundColor}">
-                <Button Text="←" Grid.Column="0" VerticalOptions="Start" Padding="5" Margin="5, 5, 0, 0" HeightRequest="30" Clicked="HomePageButton_Clicked"/>
-                <ScrollView Grid.Column="1">
+                <Button Text="←" Grid.Column="0" VerticalOptions="Start" Padding="5" FontFamily="NotoSansSymbols2" Margin="5, 5, 0, 0" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" BackgroundColor="Transparent"  HeightRequest="30" Clicked="HomePageButton_Clicked"/>
+                <ScrollView Grid.Column="1" VerticalScrollBarVisibility="Never">
                     <VerticalStackLayout>
                         <Label Text=""/>
                         <!-- <Label x:Name="SongLyricsTextLabel" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" FontSize="Large" Text="No lyrics were found from this song's data." /> -->
@@ -369,19 +383,19 @@
             <ScrollView x:Name="PageSettings" Grid.Row="0" BackgroundColor="{DynamicResource HomePageBackgroundColor}" IsVisible="False">
 
                 <VerticalStackLayout>
-                    <Label Text="Settings" HorizontalTextAlignment="Center" Margin="0,10,0,0" FontSize="Medium"/>
-                    <Border StrokeShape="RoundRectangle 25, 25, 25, 25" Stroke="#00000000" BackgroundColor="#3a3d4d" Margin="100, 20, 100, 0">
+                    <Label Text="Settings" HorizontalTextAlignment="Center" Margin="0,10,0,0" FontSize="Medium" FontFamily="RobotoBold"/>
+                    <Border StrokeShape="RoundRectangle 25, 25, 25, 25" Stroke="#00000000" BackgroundColor="#3a3d4d" Margin="20, 20, 20, 0">
                         <VerticalStackLayout>
-                            <Button x:Name="SettingsAddFolderButton" Text="🗀 Add a folder" Clicked="SettingsPageAddFolderButton_Clicked" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
+                            <Button x:Name="SettingsAddFolderButton" Text="🗀 | Add a folder" Clicked="SettingsPageAddFolderButton_Clicked" FontFamily="NotoSansSymbols2" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}"/>
                             <CollectionView x:Name="SettingsFolderCollection" Margin="0,0,0,5">
 
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate>
                                         <Border Stroke="#00000000" StrokeThickness="0" StrokeShape="RoundRectangle 10, 10, 10, 10" BackgroundColor="#080808" Margin="5">
-                                            <HorizontalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                                                <Label Text="{Binding FolderPath}" Padding="10"/>
-                                                <Button Text="X" TextColor="White" BackgroundColor="#fa7070" Clicked="SettingsPageRemoveFolderButton_Clicked"/>
-                                            </HorizontalStackLayout>
+                                            <Grid ColumnDefinitions="0.1*, 2*, Auto" VerticalOptions="Center" >
+                                                <Label Text="{Binding FolderPath}" TextColor="White" Grid.Column="1" LineBreakMode="MiddleTruncation" Padding="10"/>
+                                                <Button Text="X" TextColor="White" Grid.Column="2" BackgroundColor="#fa7070" Clicked="SettingsPageRemoveFolderButton_Clicked"/>
+                                            </Grid>
 
                                         </Border>
                                     </DataTemplate>
@@ -392,17 +406,31 @@
                     </Border>
                     <!-- <ActivityIndicator x:Name="SettingsIndexingFoldersActivityIndicator" IsRunning="False" Color="{DynamicResource UniversalMediaPlayerThumbColor}" /> -->
                     <Label Text="" />
-                    <Button Text="Select Theme" WidthRequest="200" Clicked="SettingsPageAddThemeButton_Clicked" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
+                    <Button Text="Select Theme" WidthRequest="200" Clicked="SettingsPageAddThemeButton_Clicked"  FontAttributes="Bold" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerThumbColor}" />
                     <Label Text=""/>
-                    <Label Text="Tip: Normalize/compress audio files online for an even sound experience." HorizontalTextAlignment="Center" ToolTipProperties.Text="A normalization implementation in-app with NAudio resulted in noticeably slower performance for relatively longer files." />
-                    <Label Text="This app uses tags to get information on files. You can use projects like MP3TagEdit to easily view and edit these tags." HorizontalTextAlignment="Center" />
-                    <Line />
+                    <!-- <Label Text="Tip: Normalize/compress audio files online for an even sound experience." HorizontalTextAlignment="Center" ToolTipProperties.Text="A normalization implementation in-app with NAudio resulted in noticeably slower performance for relatively longer files." /> -->
+                    <!-- <Label Text="This app uses tags to get information on files. You can use projects like MP3TagEdit to easily view and edit these tags." HorizontalTextAlignment="Center" /> -->
+                    <Label Text="" />
                     <VerticalStackLayout x:Name="SettingsPreferencesVerticalStack">
                         <!--  <HorizontalStackLayout Spacing="5"> -->
                         <!-- <Label Text="Quick load albums" VerticalOptions="Center" ToolTipProperties.Text="Theoretically allows for faster opening of albums but at a performance cost"/> -->
                         <!-- <Switch VerticalOptions="Center" AutomationId="QuickLoadAlbums" Toggled="UpdatePreferenceSelection"/> -->
                         <!-- </HorizontalStackLayout> -->
+                        
                     </VerticalStackLayout>
+                    <VerticalStackLayout>
+                        <HorizontalStackLayout HorizontalOptions="Center">
+                            <Label Text="Album tile size scale multiplier: " HorizontalTextAlignment="Center" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
+                            <Label x:Name="SettingsAdjustAlbumTileSizeSliderLabel" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
+                        </HorizontalStackLayout>
+                        <Grid ColumnDefinitions="Auto, *, Auto" Padding="30, 0, 30, 0">
+                            <Label Text="0.5" Grid.Column="0" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
+                            <Slider  Minimum="0.5" Maximum="1.5" Grid.Column="1" Value="1" x:Name="SettingsAdjustAlbumTileSizeSlider" ValueChanged="SettingsAdjustAlbumTizeSizeSlider_ValueChanged" MinimumTrackColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" ThumbColor="{DynamicResource UniversalMediaPlayerThumbColor}" />
+                            <Label Text="1.5" Grid.Column="2" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                    
+                    <Button x:Name="SettingsShowHowToGuidePopupButton" Pressed="SettingsShowHowToGuidePopupButton_Pressed" Text="Show How-to Guide" Margin="10" TextColor="{DynamicResource UniversalMediaPlayerIconTextColor}" BackgroundColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" />
 
                 </VerticalStackLayout>
 
@@ -417,31 +445,34 @@
                     </LinearGradientBrush>
                 </ContentView.Background>
 
-
+                
                 <Grid ColumnDefinitions="1*, 18*, 1*" RowDefinitions="1*, 18*, 1*" >
                     <!-- x:Name="CurrentlyPlayingPage_ContentViewGrid"-->
 
                     <Grid Grid.Column="1" Grid.Row="1" VerticalOptions="FillAndExpand"     RowDefinitions="Auto, *, Auto, 20" RowSpacing="10">
 
-                        <Label Text="Go back" FontFamily="JetBrainsIconFont" Grid.Row="0">
+                        <Label Text="←" FontFamily="NotoSansSymbols2" FontAttributes="Bold" Padding="5">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="CloseCurrentlyPlayingScreen" NumberOfTapsRequired="1" />
                             </Label.GestureRecognizers>
                         </Label>
                         <Grid RowDefinitions="*, Auto" Grid.Row="1" >
-                            <Border x:Name="UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder" HorizontalOptions="Center" VerticalOptions="Center" Grid.Row="0"  StrokeShape="RoundRectangle 15, 15, 15, 15" Stroke="Transparent" StrokeThickness="5">
+                            <Border x:Name="UniversalMediaPlayer_AlbumArtImageCurrentlyPlayingBorder" HorizontalOptions="Center" VerticalOptions="Center" Grid.Row="0"  StrokeShape="RoundRectangle 25, 25, 25, 25" Stroke="Transparent" StrokeThickness="5">
+                                <Border.Shadow>
+                                    <Shadow Brush="Black" Radius="25"/>
+                                </Border.Shadow>
                                 <Image x:Name="UniversalMediaPlayer_AlbumArtImageCurrentlyPlaying"  VerticalOptions="FillAndExpand" Source="{Binding Path=Source, Source={x:Reference UniversalMediaPlayer_AlbumArtImage}}" Loaded="Image_Loaded"/>
                             </Border>
 
                             <VerticalStackLayout Grid.Row="1" Margin="0, 5, 0, 0" Spacing="10">
                                 <Label Text="{Binding Text, Source={x:Reference UniversalMediaPlayer_CurrentlyPlayingName}}" x:Name="UniversalMediaPlayer_CurrentlyPlayingNameScreenVer" MaxLines="2" HorizontalTextAlignment="Center" FontAttributes="Bold" FontSize="Subtitle"/>
                                 <Label Text="{Binding Text, Source={x:Reference UniversalMediaPlayer_CurrentlyPlayingArtists}}" x:Name="UniversalMediaPlayer_CurrentlyPlayingArtistsScreenVer" HorizontalTextAlignment="Center" FontSize="Caption" TextColor="DarkGray"/>
-                        
+                                <Label Text="" FontSize="Medium" /> <!-- empty space, trying to center in a weird manner -->
                             </VerticalStackLayout>
 
-                            </Grid>
+                        </Grid>
                         <VerticalStackLayout Spacing="20" Grid.Row="2">
-                            
+
                             <Grid  RowDefinitions="Auto,Auto">
                                 <Slider x:Name="UniversalMediaSlider"  VerticalOptions="Center" HorizontalOptions="FillAndExpand" Grid.Row="0" MinimumTrackColor="{DynamicResource UniversalMediaPlayerThumbColor}"  ThumbColor="{DynamicResource UniversalMediaPlayerThumbColor}" MaximumTrackColor="White" DragCompleted="UniversalMediaSlider_DragCompleted" DragStarted="UniversalMediaSlider_DragStarted" />
                                 <FlexLayout JustifyContent="SpaceBetween" Grid.Row="1" >
@@ -457,14 +488,14 @@
                                 <Button Text=")|" x:Name="UniversalMediaNextTrackButton" TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" BackgroundColor="Transparent" Clicked="UniversalMediaNextTrackButton_Clicked" Padding="10" FontFamily="JetBrainsIconFont" FontSize="Title" BorderWidth="0" />
 
                             </FlexLayout>
-                            
+
                         </VerticalStackLayout>
-                        
+
                         <HorizontalStackLayout HorizontalOptions="End"  VerticalOptions="Center" Margin="0, 0, 0, 15">
                             <Button Text="🎤" x:Name="UniversalMediaShowLyricsButton" Clicked="UniversalMediaElementPlayer_ShowLyricsClicked" FontFamily="NotoSansSymbols2" TextColor="White" Opacity="0.5" BackgroundColor="Transparent" BorderColor="Transparent" />
                             <Button Text="⇋" Clicked="UniversalMediaElementPlayer_ShuffleFlagClicked"  TextColor="White" Opacity="0.5" BackgroundColor="Transparent" BorderColor="Transparent"/>
                             <Button Text="⟳" Clicked="UniversalMediaElementPlayer_LoopFlagClicked" FontSize="20"  TextColor ="White" BackgroundColor="Transparent" Opacity="0.5" BorderColor="Transparent"/>
-                            <Slider x:Name="UniversalMediaElementPlayer_VolumeSlider"  WidthRequest="140" DragCompleted="UniversalMediaElementPlayer_VolumeSlider_DragCompleted" Value="0.5" MaximumTrackColor="White" />
+                            <Slider x:Name="UniversalMediaElementPlayer_VolumeSlider"  MinimumTrackColor="White" ThumbColor="White"  WidthRequest="140" DragCompleted="UniversalMediaElementPlayer_VolumeSlider_DragCompleted" Value="0.5" MaximumTrackColor="White" />
 
                         </HorizontalStackLayout>
 
@@ -504,14 +535,14 @@
                                 <ColumnDefinition Width="*" />
 
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.ColumnSpan="2" Grid.Column="0" HeightRequest="5"  x:Name="UniversalMediaPlayerBar_RelativePosition" BackgroundColor="{DynamicResource UniversalMediaPlayerThumbColor}" VerticalOptions="FillAndExpand" HorizontalOptions="Start" Margin="0, 0, 0, 95" WidthRequest="{DynamicResource UniversalMediaPlayerBar_RelativeSliderPosition}" ZIndex="10" />
+                            <Grid Grid.ColumnSpan="2" Grid.Column="0" HeightRequest="5"  x:Name="UniversalMediaPlayerBar_RelativePosition" BackgroundColor="{DynamicResource UniversalMediaPlayerThumbColor}" VerticalOptions="FillAndExpand" HorizontalOptions="Start" Margin="0, 0, 0, 95" WidthRequest="0" ZIndex="10" />
 
                             <Grid Grid.Column="0" ColumnDefinitions="1*, 8*, 1*" RowDefinitions="1*, 8*, 1*" HeightRequest="100" WidthRequest="100" >
                                 <Border Grid.Column="1" Grid.Row="1" StrokeShape="RoundRectangle 25, 25, 0, 0" Stroke="Transparent" StrokeThickness="0">
                                     <Image  Source="download_svgrepo_comwhite.png" BackgroundColor="{DynamicResource UniversalMediaPlayerAlbumArtBackgroundColor}" />
                                 </Border>
                                 <Border Grid.Column="1" Grid.Row="1" StrokeShape="RoundRectangle 10, 10, 10, 10" Stroke="Transparent" StrokeThickness="0">
-                                    <Image  x:Name="UniversalMediaPlayer_AlbumArtImage" Loaded="Image_Loaded">
+                                    <Image  x:Name="UniversalMediaPlayer_AlbumArtImage" Loaded="Image_Loaded"> 
                                         <Image.Shadow>
                                             <Shadow Brush="Black" Radius="5" Opacity="0.6" />
                                         </Image.Shadow>
@@ -530,7 +561,7 @@
                         <FlexLayout Grid.Column="1"  ZIndex="1" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"   >
                             <Button x:Name="UniversalMediaPlayStopButton" FlexLayout.Grow="1" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"  Text="|>" FontSize="Large" FontAttributes="Bold" FontFamily="JetBrainsIconFont"  TextColor="{DynamicResource UniversalMediaPlayerIconBackgroundColor}" BackgroundColor="Transparent" BorderWidth="0"  Clicked="UniversalMediaPlayStopButton_Clicked" />
 
-                            <toolkit:MediaElement x:Name="UniversalMediaElementPlayer" Source="" MaximumHeightRequest="0" MaximumWidthRequest="0" Volume="0.5" ShouldShowPlaybackControls="False" PositionChanged="UniversalMediaElementPlayer_PositionChanged" MediaEnded="UniversalMediaElementPlayer_MediaEnded" ShouldAutoPlay="True" IsVisible="False" />
+                            <toolkit:MediaElement x:Name="UniversalMediaElementPlayer" Source=""  MaximumHeightRequest="0" MaximumWidthRequest="0" Volume="0.5" ShouldShowPlaybackControls="True" PositionChanged="UniversalMediaElementPlayer_PositionChanged" MediaEnded="UniversalMediaElementPlayer_MediaEnded" ShouldAutoPlay="True" IsVisible="False" />
                         </FlexLayout>
 
 
