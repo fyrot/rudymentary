@@ -1,5 +1,12 @@
 # Rudymentary             <img src="https://raw.githubusercontent.com/fyrot/rudymentary/475c68a965ca44cde4ce133abdbb58522d1f2069/Resources/AppIcon/rudymentarylogoborder.svg" width="24" height="24" margin-left="100" />
-*An open-source, lightweight, local music player application developed with Microsoft's C# .NET MAUI framework -- providing support for various platforms including Windows, macOS, Android, and iOS.* ***by fyrot***
+
+*An open-source, lightweight, local music player application developed with Microsoft's C# .NET MAUI framework -- providing support for various platforms including Windows, macOS, Android, and iOS.*
+
+### Maintenance note
+
+This repository likely won't see any updates; instead it'll be left here as a public archive. Rudymentary was a good exercise in not only learning how to use a language (C#) but in going beyond the syntax and actually interacting with some of its more fledgling frameworks (.NET MAUI), and as it names suggests, its UX is undoubtedly quite basic and less flashy. It's definitely been a stepping stone in how I approach not only user-facing design but also in how I wrote the supporting logic for the app -- there's definitely a lot I would have changed and the develeopments I've made in my approach should be way more obvious when looking at some of these later small projects, haha.
+
+For my friends who have been eagerly awaiting a build of this since day one.. uh.. you can try cloning this repository and build it yourself (yay)! This idea was continued and expanded upon in Rhymx ("rhymx-tw"), where the app goes from being built on MAUI to an Electron app, that started incorporating a much more appealing (at least, in my opinion) visual style alongside backend improvements like better music organization, caching, synced lyrics support, and a framework for building "side-loadable" plugins that can execute code and communicate with the app (kind of like modes). See you later!
 
 ## Feature list
  - Ability to select various root folders to automatically categorize and index all music (.mp3, .flac) files within that directory
